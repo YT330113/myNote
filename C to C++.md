@@ -578,6 +578,329 @@ int main() {
 
 ```
 2021 12 10
+
 ---
+- 类：是在C的struct类型上，增加了“成员函数”。
+- C的strcut可将一个概念或实体的所有属性组合在一起，描述同一类对象的共同属性，
+- C++使得struct不但包含数据，还包含函数(方法)用于访问或修改类变量(对象)的这些属性。
+
+```cpp
+#include <iostream>
+using namespace std;
+struct Date {
+    int d, m, y;
+    void init(int dd, int mm, int yy) {
+        d = dd; m = mm; y = yy;
+    }
+
+    void print() {
+        cout << y << "-" << m << "-" << d << endl;
+    }
+};
+
+int main (){
+    Date day; 
+    day.print();          //通过类Date对象day调用类Date的print方法
+    day.init(4, 6, 1999); //通过类Date对象day调用类Date的init方法
+    day.print();          //通过类Date对象day调用类Date的print方法
+
+    return 0;
+}
+
+```
+```cpp
+// 成员函数 返回 “自引用” （*this）
 
 
+#include <iostream>
+using namespace std;
+struct Date {
+  int d, m, y;
+
+  void init(int dd, int mm, int yy) {
+    d = dd; m = mm; y = yy;
+  }
+
+  void print() {
+    cout << y << "-" << m << "-" << d << endl;
+  }
+
+ Date& add(int dd) {
+    d = d + dd;
+    return *this; //this是指向调用这个函数的类型对象指针，
+                  // *this就是调用这个函数的那个对象
+                  //这个成员函数返回的是“自引用”，即调用这个函数的对象本身
+                  //通过返回自引用，可以连续调用这个函数
+                  // day.add(3);
+                  // day.add(3).add(7);
+  }
+};
+
+int main() {
+  Date day;
+  day.print(); //通过类Date对象day调用类Date的print方法
+  day.init(4, 6, 1999); //通过类Date对象day调用类Date的init方法
+  day.print(); //通过类Date对象day调用类Date的print方法
+  day.add(3);
+  day.add(5).add(7);
+  day.print();
+
+  return 0;
+}
+
+```
+
+
+```cpp
+//成员函数重载“运算符函数”
+
+
+#include <iostream>
+using namespace std;
+struct Date {
+  int d, m, y;
+
+  void init(int dd, int mm, int yy) {
+    d = dd; m = mm; y = yy;
+  }
+
+  void print() {
+    cout << y << "-" << m << "-" << d << endl;
+  }
+
+  Date& operator+=(int dd) {
+    d = d + dd;
+    return *this; //this是指向调用这个函数的类型对象指针，
+                  // *this就是调用这个函数的那个对象
+                  //这个成员函数返回的是“自引用”，即调用这个函数的对象本身
+                  //通过返回自引用，可以连续调用这个函数
+                  // day.add(3);
+                  // day.add(3).add(7);
+  }
+};
+
+int main() {
+  Date day;
+  day.print(); //通过类Date对象day调用类Date的print方法
+  day.init(4, 6, 1999); //通过类Date对象day调用类Date的init方法
+  day.print(); //通过类Date对象day调用类Date的print方法
+  day += 3; // day.add(3);
+  (day += 5) += 7; //day.add(5).add(7);
+  day.print();
+
+return 0;
+}
+```
+- 构造函数和析构函数
+  - 构造函数是**和类名同名**且**没有返回类型**的函数，**在定义对象时会自动被调用**，而不需要在单独调用专门的初始化函数如init，
+  - 构造函数**用于初始化类对象成员**，包括申请一些资源，如分配内存、打开某文件等
+  - 析构函数是在类对象销毁时被自动调用，用于释放该对象占用的资源，如释放占用的内存、关闭打开的文件
+
+```cpp
+#include <iostream>
+using namespace std;
+struct Date {
+  int d, m, y;
+
+  Date(int dd, int mm, int yy) {  //Date函数与类同名，且没有返回值，是构造函数；构造函数在定义一个该类对象的时候会被自动调用
+    d = dd; m = mm; y = yy;
+    cout << "构造函数" << endl;
+  }
+
+  void print() {
+    cout << y << "-" << m << "-" << d << endl;
+  }
+
+  ～Date() {        //析构函数名是~和类名，且不带参数，没有返回类型
+                    //目前不需要做任何释放工作，因为构造函数没申请资源
+    cout << "析构函数" << endl;
+  }
+};
+int main(){
+  Date day;         //错：会自动调用构造函数，但没提供3个参数
+                    //即时不定义构造函数，C++也会自动生成一个默认构造函数，默认构造函数不包含参数 
+
+  Date(4, 6, 1999); //会自动调用构造函数Date(int dd, int mm, int yy)
+                    // day.init(4, 6, 1999); //通过类Date对象day调用类Date的init方法
+  day.print();      //通过类Date对象day调用类Date的print方法
+
+  return 0;
+}
+
+```
+
+执行上述代码，看看构造函数和析构函数执行了吗？
+
+假如想如下调用构造函数构造对象，是不是要定义多个同名的构造函数（即重载构造函数）?
+
+```cpp
+Date day;
+Date day1（2）;
+Date day2(23, 10);
+Date day3(2,3,1999);
+```
+当然可以的
+
+```cpp
+struct Date {
+  int d, m, y;
+
+  Date() {
+    d = m = 1; y = 2000;
+    cout << "构造函数" << endl;
+  }
+
+  Date(int dd) {
+    d = dd; m = 1; y = 2000;
+    cout << "构造函数" << endl;
+  }
+
+  Date(int dd, int mm) {
+    d = dd; m = mm; y = 2000;
+    cout << "构造函数" << endl;
+  }
+
+  Date(int dd, int mm, int yy) {
+    d = dd; m = mm; y = yy;
+    cout << "构造函数" << endl;
+  }
+
+  void print() {
+  cout << y << "-" << m << "-" << d << endl;
+}
+
+  ~Date() {             //析构函数名是~和类名，且不带参数，没有返回类型
+                        //目前不需要做任何释放工作，因为构造函数没申请资源
+    cout << "析构函数" << endl;
+  }
+};
+
+```
+
+为什么不用默认参数呢？也可以使用c++特有的默认参数功能，即定义的时候就初始化
+
+```cpp
+#include <iostream>
+using namespace std;
+using namespace std;
+
+struct Date {
+  int d, m, y;
+
+  Date(int dd = 1, int mm = 1, int yy = 1999) {
+    d = dd; m = mm; y = yy;
+    cout << "构造函数" << endl;
+  }
+
+  void print() {
+    cout << y << "-" << m << "-" << d << endl;
+    }
+
+  ~Date() {                 //析构函数名是~和类名，且不带参数，没有返回类型
+                            //目前不需要做任何释放工作，因为构造函数没申请资源
+    cout << "析构函数" << endl;
+  }
+};
+
+int main(){
+  Date day;
+  Date day1(2);
+  Date day2(23, 10);
+  Date day3(2, 3, 1999);
+  day.print();
+  day1.print();
+  day2.print();
+  day3.print();
+
+  return 0;
+}
+
+```
+
+```cpp
+//析构函数示例
+
+
+#define _CRT_SECURE_NO_WARNINGS      //windows系统,可防止报错
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+struct student {
+
+  char *name;
+  int age;
+
+  student(char *n = "no name", int a = 0) {
+    name = new char[100]; // 比malloc好!
+    strcpy(name, n);      //指针不能赋值给指针变量，所以对于字符串类型变量要用字符拷贝strcpy函数来赋值
+    age = a;
+    cout << "构造函数，申请了100个char元素的动态空间" << endl;
+}
+
+  virtual ~student(){         // 析构函数
+    delete name;              // 不能用free!
+    cout << "析构函数，释放了100个char元素的动态空间" << endl;
+  }
+};
+
+int main() {
+  cout << "Hello!" << endl << endl;
+  student a;      //student类有默认值初始化，所以对象a为默认值
+                  //在定义student类对象a时会默认自动调用一次构造函数即student函数
+  cout << a.name << ", age " << a.age << endl << endl;
+  student b("John");
+  cout << b.name << ", age " << b.age << endl << endl;
+
+  b.age = 21;
+  cout << b.name << ", age " << b.age << endl << endl;
+  student c("Miki", 45);
+  cout << c.name << ", age " << c.age << endl << endl;
+  cout << "Bye!" << endl << endl;
+
+  return 0;              //程序执行完毕后会执行三次析构函数来释放掉申请的动态内存空间
+}
+
+```
+- 访问控制、类接口
+  将关键字struct换成class
+  struct 默认public，class默认private
+
+```cpp
+
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class student {
+  char *name;
+  int age;
+
+  student(char *n = "no name", int a = 0) {
+  name = new char[100]; // 比malloc好!
+    strcpy(name, n);
+    age = a;
+    cout << "构造函数，申请了100个char元素的动态空间" << endl;
+  }
+
+  virtual ~student() { // 析构函数
+    delete name; // 不能用free!
+    cout << "析构函数，释放了100个char元素的动态空间" << endl;
+  }
+};
+
+int main() {
+  cout << "Hello!" << endl << endl;
+  student a; //编译出错:无法访问 private 成员(在“student”类中声明)
+  cout << a.name << ", age " << a.age << endl << endl; //编译出错
+  student b("John"); //编译出错
+  cout << b.name << ", age " << b.age << endl << endl;//编译出错
+  b.age = 21; //编译出错
+  cout << b.name << ", age " << b.age << endl << endl;//编译出错
+  
+  return 0;
+}
+
+```
