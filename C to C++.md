@@ -1304,29 +1304,105 @@ int main() {
 
 #include <vector>
 #include <iostream>
+
 using std::cout;
 using std::cin;
 using std::endl;
 using std::vector;
+
 int main() {
-vector<double> student_marks;
-int num_students;
-cout << "Number of students: " << endl;
-cin >> num_students;
-student_marks.resize(num_students);
-for (vector<double>::size_type i = 0; i < num_students; i++) {
-cout << "Enter marks for student #" << i + 1
-<< ": " << endl;
-cin >> student_marks[i];
-}
-cout << endl;
-for (vector<double>::iterator it = student_marks.begin();
-it != student_marks.end(); it ++) {
-cout << *it << endl;
-}
-return 0;
+    vector<double> student_marks;
+    int num_students;   //学生人数
+    cout << "Number of students: " << endl;
+    cin >> num_students;
+    student_marks.resize(num_students);   //student_marks默认是0，现在重新设置为num_students
+
+    //循环录入每个学生的mark
+    for (vector<double>::size_type i = 0; i < num_students; i++) {    size_type是vector内部定义的一个类型，相当于整形，说是比较安全
+        cout << "Enter marks for student #" << i + 1 << ": " << endl;
+        cin >> student_marks[i];
+    }
+
+    cout << endl;
+    //输出每个成绩
+    for (vector<double>::iterator it = student_marks.begin();  
+        it != student_marks.end(); it ++) { //iterator是类内部的一个迭代器类，it是一个迭代器类型的变量 ，it指向student_marks的起始位置
+        cout << *it << endl;
+    }
+  
+    return 0;
 }
 
 
 ```
 
+- 继承 Inheritance 
+- 派生 Derivation
+- 一个派生类(derived class)从1个或多个父类(parent class) / 基类(base class)继承，即继承父类的属性和行为，但也有自己的特有属性和行为
+
+```c++
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Employee{           //定义一个公司的雇员类
+    string name;          //定义雇员姓名属性
+public:   
+    Employee(string n);   //构造函数，可以构造一个雇员
+                          //在类体内先声明一个函数，函数实现定义在类体外
+    void print();         //雇员有一个print的行为
+};
+
+class Manager: public Employee{ //雇员可以派生出一个经理，经理与雇员有相似属性，但也有特有属性
+                                //继承格式，public表示完全继承，还有private等方式
+    int level;                  //定义级别属性
+public:
+    Manager(string n, int l = 1); 
+    //void print();        //不用再定义print行为，其父类已经有了这个行为，它已经继承过了
+};
+
+Employee::Employee(string n) :name(n)//定义在类体内声明过的函数
+//初始化成员列表
+{
+//上一句相当于name = n;
+}
+
+void Employee::print() {
+    cout << name << endl;
+}
+
+Manager::Manager(string n, int l) :Employee(n), level(l) {
+}
+
+//派生类的构造函数只能描述它自己的成员和其直接基类的初始式，不能去初始化基类的成员。
+Manager::Manager(string n, int l) : name(n), level(l) {
+}
+
+int main() {
+    Manager m("Zhang",2);
+    Employee e("Li");
+    m.print();
+    e.print();
+}
+
+class Manager : public Employee
+{
+int level;
+public:
+Manager(string n, int l = 1);
+void print();
+};
+Manager::Manager(string n, int l) :Employee(n), level(l) {
+}
+void Manager::print() {
+cout << level << "\t";
+Employee::print();
+}
+int main() {
+Manager m("Zhang");
+Employee e("Li");
+m.print();
+e.print();
+}
+```
