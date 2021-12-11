@@ -879,7 +879,7 @@ class student {
   int age;
 
   student(char *n = "no name", int a = 0) {
-  name = new char[100]; // 比malloc好!
+    name = new char[100]; // 比malloc好!
     strcpy(name, n);
     age = a;
     cout << "构造函数，申请了100个char元素的动态空间" << endl;
@@ -893,19 +893,440 @@ class student {
 
 int main() {
   cout << "Hello!" << endl << endl;
-  student a; //编译出错:无法访问 private 成员(在“student”类中声明)
+  student a;                                           //编译出错:无法访问 private 成员(在“student”类中声明)
   cout << a.name << ", age " << a.age << endl << endl; //编译出错
-  student b("John"); //编译出错
-  cout << b.name << ", age " << b.age << endl << endl;//编译出错
-  b.age = 21; //编译出错
-  cout << b.name << ", age " << b.age << endl << endl;//编译出错
+  student b("John");                                   //编译出错
+  cout << b.name << ", age " << b.age << endl << endl;                                //编译出错
+  b.age = 21;                                           //编译出错
+  cout << b.name << ", age " << b.age << endl << endl;  //编译出错
   
   return 0;
 }
 
 ```
+class定义的类的成员默认都是私有的private，外部函数无法通过类对象成员或类成员函数访问
+
+```cpp
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class student {
+                    //默认私有的，等价于 private:
+    char *name;
+    int age;
+public: //公开的
+    student(char *n = "no name", int a = 0) {
+        name = new char[100]; // 比malloc好!
+        strcpy(name, n);
+        age = a;
+        cout << "构造函数，申请了100个char元素的动态空间" << endl;
+    }
+    virtual ~student() { // 析构函数
+
+        delete name; // 不能用free!
+       cout << "析构函数，释放了100个char元素的动态空间" << endl;
+    }
+};
+int main() {
+    cout << "Hello!" << endl << endl;
+    student a; //OK
+    cout << a.name << ", age " << a.age << endl ; //编译出错: 无法访问private 成员(在“student”类中声明)
+    student b("John");
+    cout << b.name << ", age " << b.age << endl ;//编译出错
+    b.age = 21;
+    cout << b.name << ", age " << b.age << endl l;//编译出错
+    return 0;
+}
+
+
+
+a.name，a.age仍然不能访问， 如何进一步修改呢？
+
+
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class student {
+//默认私有的，等价于 private:
+    char *name;
+    int age;
+public: //公开的
+    char *get_name() { return name; }
+    int get_age() { return age; }
+    void set_age(int ag) { age = ag; }
+    student(char *n = "no name", int a = 0) {
+        name = new char[100]; // 比malloc好!
+        strcpy(name, n);
+        age = a;
+        cout << "构造函数，申请了100个char元素的动态空间" << endl;
+    }
+    virtual ~student() { // 析构函数
+        delete name; // 不能用free!
+        cout << "析构函数，释放了100个char元素的动态空间" << endl;
+    }
+};
+
+int main() {
+    cout << "Hello!" << endl << endl;
+
+    student a;
+    cout << a.get_name() << ", age " << a.get_age() << endl ; //编译出错
+
+    student b("John");
+    cout << b.get_name() << ", age " << b.get_age() << endl l; //编译出错
+
+    b.set_age(21);
+    cout << b.get_name() << ", age " << b.get_age() << endl ; //编译出错
+
+    return 0;
+}
+
+```
+
+- 接口：public的公开成员（一般是成员函数）称为这个类的对外接口，外部函数只能通过这些接口访问类对象，
+- private等非public的包含内部内部细节，不对外公开，从而可以封装保护类对象！
+
+```cpp
+定义一个数组类array
+
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+class Array {
+    int size;
+    double *data;
+public:
+    Array(int s) {
+    size = s;
+    data = new double[s];
+    }
+
+    virtual ~Array() {
+        delete[] data;
+    }
+
+    double &operator [] (int i) {
+        if (i < 0 || i >= size){
+            cerr << endl << "Out of bounds" << endl;
+            throw "Out of bounds";
+        }
+        else return data[i];
+    }
+};
+
+int main() {
+    Array t(5);
+
+    t[0] = 45; // OK
+    t[4] = t[0] + 6; // OK
+    cout << t[4] << endl; // OK
+    t[10] = 7; // error!
+
+    return 0;
+}
+
+```
+
 ---
 2021 12 11
 
-1
+- 拷贝构造函数：定义一个类对象时用同类型的另外对象初始化
+- 赋值运算符：一个对象赋值给另外一个对象
+
+```cpp
+#define _CRT_SECURE_NO_WARNINGS //windows系统
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+struct student {
+char *name;
+int age;
+student(char *n = "no name", int a = 0) {
+name = new char[100]; // 比malloc好!
+strcpy(name, n);
+age = a;
+cout << "构造函数，申请了100个char元素的动态空间" << endl;
+}
+virtual ~student() { // 析构函数
+delete[] name; // 不能用free!
+cout << "析构函数，释放了100个char元素的动态空间" << endl;
+}
+};
+int main() {
+student s;
+student k("John", 56);
+cout << k.name << ", age " << k.age << endl;
+student m(s); //拷贝构造函数
+s = k; //赋值运算符
+cout << s.name << ", age " << s.age << endl;
+return 0;
+}
+默认的“拷贝构造函数”是“硬拷贝”或“逐成员拷贝”，name指针同一块动态字符数组，当多次释
+放同一块内存就不错了！
+指应该增加“拷贝构造函数”，保证各自有单独的动态数组空间。
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+struct student {
+char *name;
+int age;
+student(char *n = "no name", int a = 0) {
+name = new char[100]; // 比malloc好!
+strcpy(name, n);
+age = a;
+cout << "构造函数，申请了100个char元素的动态空间" << endl;
+}
+student(const student &s) { // 拷贝构造函数 Copy
+constructor
+name = new char[100];
+strcpy(name, s.name);
+age = s.age;
+cout << "拷贝构造函数，保证name指向的是自己单独的内存块" << endl;
+}
+student & operator=(const student &s) { // 拷贝构造函数
+Copy constructor
+strcpy(name, s.name);
+age = s.age;
+cout << "拷贝构造函数，保证name指向的是自己单独的内存块" << endl;
+return *this; //返回 “自引用”
+}
+virtual ~student(){ // 析构函数
+delete[] name; // 不能用free!
+cout << "析构函数，释放了100个char元素的动态空间" << endl;
+}
+};
+int main() {
+student s;
+student k("John", 56);
+cout << k.name << ", age " << k.age << endl ;
+student m(k);
+s = k;
+cout << s.name << ", age " << s.age << endl ;
+return 0;
+}
+
+```
+
+- 类体外定义方法（成员函数），必须在类定义中声明，类体外要有类作用域，否则就是全局外部函数了！
+
+```cpp
+
+#include <iostream>
+using namespace std;
+
+class Date {
+    int d, m, y;
+public:
+    void print();         //类申明代码，先提前申明一个函数，但不但不定义方法
+    Date(int dd = 1, int mm = 1, int yy = 1999) {
+        d = dd; m = mm; y = yy;
+        cout << "构造函数" << endl;
+    }
+
+    virtual ~Date() {       //析构函数名是~和类名，且不带参数，没有返回类型
+                            //目前不需要做任何释放工作，因为构造函数没申请资源
+        cout << "析构函数" << endl;
+    }
+};
+
+void Date::print() {    //类实现方法代码，在类外部定义如何实现类函数
+    cout << y << "-" << m << "-" << d << endl;
+}
+
+int main() {
+    Date day;
+    day.print();
+}
+
+```
+- 所有类成员函数都可以在外部定义，但要在类内部申明，在外部定义类成员函数时要加类作用域限定符`::`。
+  
+
+- 类模板：我们可以将一个类变成“类模板”或“模板类”，正如一个模板函数一样。
+
+```cpp
+//将原来的所有double换成模板类型T，并加上模板头 template<class T>
+
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+template<class T>
+class Array {
+T size;
+T *data;
+public:
+Array(int s) {
+size = s;
+data = new T[s];
+}
+virtual ~Array() {
+delete[] data;
+}
+T &operator [] (int i) {
+if (i < 0 || i >= size) {
+cerr << endl << "Out of bounds" << endl;
+throw "index out of range";
+}
+else return data[i];
+}
+};
+int main() {
+Array<int> t(5);
+t[0] = 45; // OK
+t[4] = t[0] + 6; // OK
+cout << t[4] << endl; // OK
+t[10] = 7; // error!
+Array<double> a(5);
+a[0] = 45.5; // OK
+a[4] = a[0] + 6.5; // OK
+cout << a[4] << endl; // OK
+a[10] = 7.5; // error!
+return 0;
+}
+
+```
+
+- typedef 类型别名
+
+```cpp
+#include <iostream>
+using namespace std;
+typedef int INT;
+int main() {
+INT i = 3; //等价于int i = 3;
+cout << i << endl;
+return 0;
+}
+
+```
+- string
+- string就是个**类** 类型，是c++标准库提供的标准类函数！
+
+
+```cpp
+
+//string对象的初始化
+
+//string是c++标准库提供的标准类函数！
+
+#include <iostream>
+#include <string>        //typedef std::basic_string<char> string;
+
+using namespace std;
+
+typedef string String;
+
+int main() {
+// with no arguments
+    string s1;          //调用默认构造函数：没有参数或参数有默认值，默认参数是“Anatoliy”
+    String s2("hello"); //调用普通构造函数，用户提供参数 String就是string
+    s1 = "Anatoliy";    //调用赋值运算符，"Anatoliy"是字符串类型，s1是string类型，通过赋值将字符串复制给s1
+    String s3(s1);      //这是拷贝构造函数 相当于 string s3 =s1;
+
+    cout << "s1 is: " << s1 << endl;
+    cout << "s2 is: " << s2 << endl;
+    cout << "s3 is: " << s2 << endl;
+
+
+    string s4("this is a C_sting", 10);   //s4是拷贝"this is a C_sting"的前10个字符
+    cout << "s4 is: " << s4 << endl;
+
+    // 1 - C++ string
+    // 2 - start position
+    // 3 - number of characters
+    string s5(s4, 6, 4);              // 从s4的第6个字符开始复制4个字符
+    cout << "s5 is: " << s5 << endl;
+
+    // 1 - number characters
+    // 2 - character itself
+    string s6(15, '*');               //复制15个*号
+    cout << "s6 is: " << s6 << endl;
+
+    // 1 - start iterator
+    // 2 - end iterator
+    string s7(s4.begin(), s4.end() - 5);//从s4的开始复制到结尾向前5个
+    cout << "s7 is: " << s7 << endl;
+
+    // you can instantiate string with assignment（赋值）
+    string s8 = "Anatoliy";
+    cout << "s8 is: " << s8 << endl;
+
+    string s9 = s1 + "hello"+ s2; //s1 + "hello"+ s2的结果是string类型的对象(变量)
+    cout << "s9 is: " << s9 << endl;
+
+    return 0;
+}
+
+```
+```cpp
+
+//访问其中元素、遍历
+//循环输出string类对象中的每个字符
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+    string s = "hell";
+    string w = "worl!";
+    s = s + w; //s +=w;
+
+    //第一种，通过for循环，即通过下标访问
+    for (int ii = 0; ii != s.size(); ii++)
+        cout << ii << " " << s[ii] << endl;
+    cout << endl;
+
+    //第二种，通过迭代器变量
+    string::const_iterator cii;   //const迭代器只能访问不能修改，别的也可以修改
+    int ii = 0;   
+    for (cii = s.begin(); cii != s.end(); cii++)    //cii相当于指针
+        cout << ii++ << " " << *cii << endl;
+}
+
+```
+
+- vector
+  - 也是用来表示一组数据
+  - 但其中的每个元素不一定是字符了
+  - vector本身不是一个类，是个类模板
+
+```cpp
+
+
+#include <vector>
+#include <iostream>
+using std::cout;
+using std::cin;
+using std::endl;
+using std::vector;
+int main() {
+vector<double> student_marks;
+int num_students;
+cout << "Number of students: " << endl;
+cin >> num_students;
+student_marks.resize(num_students);
+for (vector<double>::size_type i = 0; i < num_students; i++) {
+cout << "Enter marks for student #" << i + 1
+<< ": " << endl;
+cin >> student_marks[i];
+}
+cout << endl;
+for (vector<double>::iterator it = student_marks.begin();
+it != student_marks.end(); it ++) {
+cout << *it << endl;
+}
+return 0;
+}
+
+
+```
 
