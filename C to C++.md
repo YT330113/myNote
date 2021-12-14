@@ -151,7 +151,9 @@ return 0;
 }
 ```
 - C++引入了**引用类型**，即一个变量是另一个变量的别名,`&`符号
-  >#include <iostream>
+
+```cpp
+#include <iostream>
 using namespace std;
 int main ()
 {
@@ -161,10 +163,12 @@ b = 89; //也就是a的内存块值为89
 cout << "a contains: " << a << endl; // Displays 89.
 return 0;
 }
-
+```
   交换a,b值的三种程序：
 
-  - >#include <iostream>
+
+```cpp
+#include <iostream>
 using namespace std;
 void swap(int x, int y) {
 cout << "swap函数内交换前：" << x << " " << y << endl;
@@ -181,7 +185,11 @@ return 0;
 x,y得到2个int型变量的指针,x,y本身没有修改
 修改的是x,y 指向的那2个int型变量的内容
 */
-  - >void swap(int *x, int *y) {
+```
+
+```cpp
+
+void swap(int *x, int *y) {
 cout << "swap函数内交换前：" << *x << " " << *y << endl;
 int t = *x; *x = *y; *y = t;
 cout << "swap函数内交换后：" << *x << " " << *y << endl;
@@ -194,7 +202,9 @@ swap(&a, &b); // &a赋值给x,&b赋值给y,
 cout << a << ", " << b << endl; // Displays 100, 4.
 return 0;
 }
-  - >//x,y是实参的引用
+```
+```cpp
+//x,y是实参的引用
 void swap(int &x, int &y) {
 cout << "swap函数内交换前：" << x << " " << y << endl;
 int t = x; x = y; y = t;
@@ -206,7 +216,7 @@ swap(a, b); //x,y将分别是a,b的引用，即x就是a,y就是b
 cout << a << ", " << b << endl; // Displays 100, 4.
 return 0;
 }
-
+```
 **比指针好用**
 
 **效率高** 
