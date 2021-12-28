@@ -22,6 +22,7 @@
   - str（数字） 数字转为字符
 - 运行一个新打开的文件时要右击运行，不能点右上角的三角
 - 黄灯泡表示该行代码可以改进，按ALT+enter查看建议
+- 按两下shift：search for everywhere
 - python的6种数据类型
   - 数字 number
   - 字符串 string
