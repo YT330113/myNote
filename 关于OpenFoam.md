@@ -10,6 +10,7 @@
 - CFD的壁面函数：http://dyfluid.com/wallFunction.html
 - 计算流体力学 ：https://www.zhihu.com/collection/747809765
 - **openfoam里的网格对象fvMesh** https://zhulianhua.github.io/2016/10/06/of-fvMesh/
+- **openfoam C++代码的特性**https://blog.csdn.net/imastrid/article/details/119924469?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.1&utm_relevant_index=3
 - 1232123
 
 <<<<<<< HEAD
