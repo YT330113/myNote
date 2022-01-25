@@ -12,6 +12,24 @@
 
 - 计算流体力学 ：https://www.zhihu.com/collection/747809765
 
+**OpenFOAM网上学习资料**
+- 苏军伟博客 http://blog.sina.com.cn/openfoamresearch
+这显然是最常见的入门学习材料之一了，内容很多，比较全面。
+- 东岳流体 http://dyfluid.com/
+李东岳的网站，有求解器的详细资料（其实对初学者感觉还是不够详细）。比较其余两个更学术一些。还有一些OF之外的流体力学资料。
+- 戴得志的笔记 https://www.zybuluo.com/daidezhi/note/391186
+最近（2019.06.13）才发现的一套笔记，流程比较清楚，目的是自定义（并编译使用）求解器，中间的各个步骤都有讲解。内容似乎不是很多，好像作者不是专门做这个的。
+- 流沙CAE https://www.cfder.club/
+胡坤的博客。之前似乎是在新浪有一个博客的，这个应该是新的。整个博客都是偏工程应用的感觉，这个系列中的OF内容较少，也比较浅显。不过也有一些资料索引，而且也是成体系的一个博客，所以也列在这里。
+
+**OpenFOAM中 controlDict 字典文件解析**https://www.zybuluo.com/daidezhi/note/391186
+
+**OpenFOAM中 fvSchemes 字典文件解析**https://www.zybuluo.com/daidezhi/note/389113
+
+**OpenFOAM中 fvSolution 字典文件解析**https://www.zybuluo.com/daidezhi/note/392250
+
+**openfoam二维多面体网格**https://www.zybuluo.com/daidezhi/note/386328
+
 **OpenFOAM求解器开发（编译、库、包含、laplacianFoam）**：https://www.zybuluo.com/daidezhi/note/385554
 
 **商业软件划分的网格向OpenFOAM转换应注意的问题**http://blog.sina.com.cn/s/blog_5fdfa7e60100dsiq.html
