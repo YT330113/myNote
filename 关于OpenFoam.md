@@ -22,6 +22,25 @@
 - 流沙CAE https://www.cfder.club/
 胡坤的博客。之前似乎是在新浪有一个博客的，这个应该是新的。整个博客都是偏工程应用的感觉，这个系列中的OF内容较少，也比较浅显。不过也有一些资料索引，而且也是成体系的一个博客，所以也列在这里。
 
+**openfoam中的边界条件**
+1. 几何边界条件（体现在`constant/polyMesh/boundary`）
+
+- wall
+- patch
+- empty
+- cyclic
+- symmetry
+2. 物理边界条件(体现在`/0`文件夹下的物理量)
+
+- fixedValue
+- zeroGradient
+- slip
+- noslip
+- empty
+- symmetry
+- cyclic
+- coded...
+
 **OpenFOAM中 controlDict 字典文件解析**https://www.zybuluo.com/daidezhi/note/391186
 
 **OpenFOAM中 fvSchemes 字典文件解析**https://www.zybuluo.com/daidezhi/note/389113
@@ -807,3 +826,88 @@ int main(int argc, char *argv[])
     return(0); //返回0
 }
 ```
+
+---
+
+**OpenFOAM中使用字典和IOobject类实现输入输出操作.一个IOobject对象在构造的时候需要六个参数：对象名称，类名称，实例路径，一个objectRegistry的引用，以及描述读写方式的参数。**
+
+**IOobject的构造函数**
+1. 从对象名称，实例路径，objectRegistry引用和读写设置来构造。
+
+```cpp
+IOobject  	
+(  
+    const word &   	 	name,
+    const word &  		instance,
+    const objectRegistry &  	registry,
+    readOption  		r = NO_READ,
+    writeOption  		w = NO_WRITE,
+    bool  			registerObject = true
+)
+```
+2. 从对象名称，实例路径，位置，objectRegistry引用和读写设置来构造。
+
+```cpp
+IOobject  	
+(
+    const word &   	 	name,
+    const word &  		instance,
+    const fileName &  		local,
+    const objectRegistry &  	registry,
+    readOption  		r = NO_READ,
+    writeOption  		w = NO_WRITE,
+    bool  			registerObject = true
+)
+```
+
+**IOobject和字典**
+
+字典在声明的同时可以使用IOobject进行读取。通常，一个字典的内容是设置信息时，其读设置选项会设置成MUST_READ，而写设置选项则设置为NO_WRITE以防设置信息被错误的覆盖。例如通常用来读取输运性质的transportProperties字典的定义：
+
+ ```cpp
+IOdictionary transportProperties
+(
+     IOobject
+     (
+          "transportProperties",
+          runTime.constant(),
+          mesh,
+          IOobject::MUST_READ,
+          IOobject::NO_WRITE
+     )
+);
+ ``` 
+本例中使用了第一种构造函数，其中：
+
+"transportProperties" 是含有字典的文件名称。
+
+ runTime.constant()实例路径，给出字典的位置，在本例中存在于算例的constant路径下。
+
+ objectRegistry为mesh（前面提过polyMesh和fvMesh都是是objectRegistry的派生类）。
+
+**IOobject和场**
+类似于字典，对于场数据的读写设置同样也可以通过IOobject类来实现。对于各种类型的场来说，调用的语法甚至都是相同的，可以参见下面的例子。如果我们想定义一个名字叫做T的volScalarField场，并将其每个时间点计算的场数据保存下来，并放在以时间点命名的路径下，可以这样实现：
+
+```cpp
+volScalarField T
+(
+    IOobject
+    (
+        "T",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+```
+其中：
+
+"T" 为文件名。
+
+runTime.timeName()实例路径，这里是告诉OpenFOAM将每个文件存在以运行时间为名称的路径下面。
+
+mesh是所需的objectRegistry。
+
+读/写设置选项设置为MUST_READ和AUTO_WRITE以便OpenFOAM可以读取场数据并自动保存。如果不需要读场数据，则需要将MUST_READ改为NO_READ。
