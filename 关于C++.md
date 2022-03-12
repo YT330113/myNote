@@ -226,3 +226,7 @@ OpenFOAM 广泛使用模板，为了使代码易读性更好，通常将模板�
 
 typedef List<vector> vectorList;
 上面代码将 vectorList 定义为 vector 数据类型的模板 List 类的别名。
+
+  ---
+  - 一般函数形参能申明为const型的情况下应尽可能声明为const型。
+  - 
