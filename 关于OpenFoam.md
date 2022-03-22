@@ -94,7 +94,7 @@ options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LI
 **openfoam中的数据类型**
 - 基础：标量 scalar, 向量 vector, 张量 tensor，对错型 bool，整形 label
 - 场 field class类：typedef field<scalar> saclarField，typedef field<vector> vectorField,typedef field<tensor> tensorField
-- 几何场类 GeometricField class:volScalarField 体标 量场，volVectorField 体向量场，volTensorField 体张量场; 相比 field class 多了纪录场位置 的相关信息,记录了在什么样的网格上有量 a 的相关信息或数据.
+- 几何场类 GeometricField class:volScalarField 体标量场，volVectorField 体向量场，volTensorField 体张量场; 相比 field class 多了纪录场位置 的相关信息,记录了在什么样的网格上有量 a 的相关信息或数据.
 
 **编写自己的求解器**
 1. 创建一个空的求解器
@@ -103,13 +103,13 @@ options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LI
   ```cpp
    foamNewApp mySolver
    ```
-   这样就可以创建一个路径，里面有一个叫做mySolver.C的文件，文件里有写好的文件头和主函数的框子等等。这个源文件外头还有一个Make路径，Make里面也已经有了现成的files和options 文件了。
+   调用命令自动创建一个空的求解器，这样就可以创建一个路径，里面有一个叫做mySolver.C的文件，文件里有写好的文件头和主函数的框子等等。这个源文件外头还有一个Make路径，Make里面也已经有了现成的files和options 文件了。
    
    值得注意的是，这句命令最好在applications目录下运行，这样新生成的solver会和系统的求解器放在一个路径下，避免新手搞不定编译的问题。
 
 2. 创建网格对象
    
-  实际上是根据生成的网格创建一个对象。一般不需要自己搞，只要一句话:
+  实际上是根据生成的网格创建一个 ***对象***。一般不需要自己搞，只要一句话:
    ```cpp
    #include "createMesh.H"
    ```
@@ -142,7 +142,7 @@ options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LI
     )
   );
    ```
-  这一段原封不动抄进去就行。到这里是创建了一个IOdictionary的对象，叫做TransportProperties。创建的时候就用IoObject来初始化。如何初始化呢？首先从从/constant路径下的叫做"transportProperties"的文件里读入数据，这分别是IoObject里面前两行的意思。剩下的就是把这个东西注册（也就是写到）mesh上，mesh是第二步里创建出来的东西。
+  这一段原封不动抄进去就行。到这里是创建了一个IOdictionary的对象，叫做TransportProperties。创建的时候就用IoObject来初始化。如何初始化呢？首先从从/constant路径下的叫做"transportProperties"的文件里读入数据，这分别是IoObject里面前两行的意思。剩下的就是把这个东西注册（也就是写到）mesh上，mesh是第二步里创建出来的对象。
 
 ok，现在我们有一个对象叫做transportProperties，这个对象是IOdictionary类的，也就拥有了这个类下的各种函数。那么我们要用的就是查找具体系数的功能。虽然这个例子里只有一个系数，看上去多次一举。但是真正的求解器会有若干个系数，所以要分别处理。写入$\kappa$的语句是：
 ```cpp
@@ -233,8 +233,8 @@ runTime.write();
 int main()// 主函数
 {
     #include "setRootCaseLists.H"//必备
-    #include "createTime.H"//创建时间对象
-    #include "createMesh.H"//创建mesh 后续频繁使用
+    #include "createTime.H"//创建时间对象runtime
+    #include "createMesh.H"//创建mesh对象 后续频繁使用
     simpleControl simple(mesh);//创建simple对象，用于控制时间推进
     #include "createFields.H"//创建场，读取初场和系数
     Info<< "\nCalculating h transport\n" << endl;//提示计算开始
