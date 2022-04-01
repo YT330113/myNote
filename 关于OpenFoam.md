@@ -911,3 +911,123 @@ runTime.timeName()实例路径，这里是告诉OpenFOAM将每个文件存在以
 mesh是所需的objectRegistry。
 
 读/写设置选项设置为MUST_READ和AUTO_WRITE以便OpenFOAM可以读取场数据并自动保存。如果不需要读场数据，则需要将MUST_READ改为NO_READ。
+
+
+
+**openfoam添加离心力源项**
+```cpp
+Fcent
+
+fvVectorMatrix UEqn
+    (
+        fvm::ddt(rho, U)
+      + fvm::div(rhoPhi, U)
+      - fvm::laplacian(muEff, U)
+      - (fvc::grad(U) & fvc::grad(muEff))
+      //+ Fcent
+      + (rho*((2.0*M_PI/60.0*omega_vector)^((2.0*M_PI/60.0*omega_vector)^mesh.C()))) //omega_vector[1/s] in [rad/m]
+    //- fvc::div(muEff*(fvc::interpolate(dev(fvc::grad(U))) & mesh.Sf()))
+    );
+
+dimensionedVector omega_vector(twoPhaseProperties.lookup("omega_vector"));
+
+omega_vector        omega_vector [ 0 0 -1 0 0 0 0 ] (0 0 5);
+```
+
+
+---
+**创建field类对象有两种方式：**
+1. 从文件读取
+2. 直接在IOobject里面给定，包括边界
+
+
+
+**OPenFoam里的`==`**
+
+`==`是c＋＋优先级最小的符号，在OpenFOAM中他的功能和`－`相同。
+  `-fvc::grad(p)`，显式离散，该项加入到`UEqn`中的b上，前面“－”又有一个“＝＝”负负得正
+
+——苏军伟
+
+**FixedGradient：就是某个量法向的梯度值**
+
+$$g_b= \frac {S} {\|S\|} \cdot \nabla _\phi $$
+
+**openfoam列表和场（张量链表）**
+```cpp
+List<type>
+
+Field<type>
+
+typedf Field<vector> scalarField;vectorField等等**
+```
+
+
+**openfoam中的类继承关系：**
+
+
+primitiveMesh：最底层的类，只包含网格的几何信息且不包含边界信息
+polyMesh：包含了网格的边界信息
+fvMesh：由polyMesh派生而来
+
+polyMesh
+    |___polyBoundareMesh
+                 |___polyPachList
+                             |___patches
+
+fvMesh
+    |___fvBoundareMesh
+                 |___fvPach 
+                             |___patches
+
+
+(boundary由一系列patches组成)
+
+
+
+fvMesh：由polyMesh派生而来，加入了与有限体积法相关的离散的内容。fvMesh被用来访问所有的网格功能。因此离散化类与函数的交互主要是通过fvMesh和fvPatch进行的。
+
+内部面：polyMesh->fvMesh
+边界面：polyBoundaryMesh->fvBoundaryMesh
+
+主要是fvPatch和fvMesh类实现离散化和与函数的交互
+
+
+接下来定义可以将场量与网格结合起来的类GeometricField<type,...>
+  |
+  |___volField<Type>
+  |___surfaceField<type>
+  |___pointFiele<type>
+
+GeometricField<type,...>继承的属性有
+GeometricField<type,...>
+  |
+  |___Dimensions
+  |___InternalField
+  |___BoundaryField
+
+**fvm和fvc**
+finiteVolumeMethod，隐式离散
+finiteVolumeCalculate，显示计算
+
+离散就是将微分方程转为代数方程AX=b，所以只有求解的量需要离散，其余的都可作为源项不用离散直接放到代数方程组的右边
+
+fvm是将该项离散为代数方程从而生成系数矩阵fvMatrix类；fvc是显示计算（如对某时间步的场量进行某种计算）仍返回一个对应的场量geometricField类
+
+AX=b，fvm返回的就是系数A，fvc返回的就是源项b
+
+fvm::xxx(u)，其中的u是需要求出来的，fvc::xxx(u)，其中的u为当前时间步的值，其返回一个场。所以，需要你要求某个场u，就用fvm。
+
+fvc为一个名字空间，它的成员都是函数，这些函数的作用就是显式地对volScalarField,volVectorField,volTensorField进行操作，将它们映射为另一个场，例如
+volVectorField dUdt = fvc::ddt(U,EI) （这里EI指示了差分格式为Euler Implicit）
+volVectorField vorticity = 0.5*fvc::curl(U) （U为速度场，求旋度的一半，为涡量场）
+fvm的作用是产生一个矩阵。PDEs在求解的过程中需要转化为线性代数方程组，fvm正是为了完成这个任务而设计的。至于如何装配矩阵，可结合标量输运方程的离散来思考，这过程中涉及到时间离散方案、矩阵元素寻址、内存分配、甚至方程组的求解方法。这些任务没有都交给fvm去完成，而是定义了类fvMatrixScalar和fvMatrixVector。
+
+fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符）将场量离散，返回的是fvMatrix，而fvc中的函数则是显式调用，返回仍然是场量。
+
+**cfd 中的数值耗散**
+
+差分方程是微分方程的逼近，但二者之间总有误差。误差由阶次不同，可造成解的耗散和频散，其中耗散就如给流场添加了人为的粘性一样，使得本来尖锐的突越变得平滑，分辨率降低。
+
+截断项中偶数阶微分的存在使得解具有耗散性，奇数阶微分的存在使得解具有频散性。比如一道正弦曲线，耗散使之幅值变低，而频散使之相位和周期发生变化  
+
