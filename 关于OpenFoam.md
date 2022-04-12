@@ -55,7 +55,7 @@
 
  **openfoam里的网格对象fvMesh** https://zhulianhua.github.io/2016/10/06/of-fvMesh/
 
- **openfoam C++代码的特性**https://blog.csdn.net/imastrid/article/details/119924469?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.1&utm_relevant_index=3
+ **openfoam C++代码的特性** https://blog.csdn.net/imastrid/article/details/119924469?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.1&utm_relevant_index=3
 
 
  **openfoam里的网格对象fvMesh** https://zhulianhua.github.io/2016/10/06/of-fvMesh/
@@ -1030,4 +1030,11 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 差分方程是微分方程的逼近，但二者之间总有误差。误差由阶次不同，可造成解的耗散和频散，其中耗散就如给流场添加了人为的粘性一样，使得本来尖锐的突越变得平滑，分辨率降低。
 
 截断项中偶数阶微分的存在使得解具有耗散性，奇数阶微分的存在使得解具有频散性。比如一道正弦曲线，耗散使之幅值变低，而频散使之相位和周期发生变化  
+
+
+**`transformPoints`命令**
+可以缩放、旋转已生成的网格
+
+
+
 
