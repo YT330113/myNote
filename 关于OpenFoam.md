@@ -1035,6 +1035,68 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 **`transformPoints`命令**
 可以缩放、旋转已生成的网格
 
+---
+
+**微分算子相关**
+1. 对标量场而言，左梯度与右梯度相等。
+
+$$\nabla\phi=\phi\nabla$$
+
+2. 对矢量场而言，左梯度不等于右梯度，左梯度等于右梯度的转置
+
+$$\nabla\bf U=(\boldsymbol{\mathbf{U}} \mathrm{\nabla})^\mathrm T$$
+
+3. 对于向量场：（应该是常向量场）
+
+$$\nabla\cdot\bf U=\boldsymbol{\mathbf{U}} \cdot\mathrm{\nabla}$$
+
+**牛顿-莱布尼茨公式的高维扩展**
+$$\begin{equation}
+\int  \boldsymbol\nabla  f  \,\mathrm{d}{V}  = \oint f  \,\mathrm{d}{ \boldsymbol{\mathbf{s}} } 
+\end{equation}$$
+
+该公式类似于散度定理，但被积函数变为标量而不是矢量．对于一维情况，该式就是牛顿—莱布尼兹公式.
+
+**分部积分的高维拓展**
+1. 标量分部积分
+
+$$\begin{equation}
+\int ( \boldsymbol\nabla  f) g  \,\mathrm{d}{V}  = \oint fg  \,\mathrm{d}{ \boldsymbol{\mathbf{s}} }  - \int f ( \boldsymbol\nabla  g)  \,\mathrm{d}{V} 
+\end{equation}$$
+
+2. 矢量分部积分
+
+$$\begin{equation}
+\int f ( \boldsymbol{\nabla}\boldsymbol{\cdot}   \boldsymbol{\mathbf{A}} ) \,\mathrm{d}{V}  =  \oint f  \boldsymbol{\mathbf{A}}   \boldsymbol\cdot   \,\mathrm{d}{ \boldsymbol{\mathbf{s}} }  - \int \boldsymbol{\mathbf{A}}   \boldsymbol\cdot  ( \boldsymbol\nabla  f) \,\mathrm{d}{V} 
+\end{equation}$$
+
+$$\begin{equation}
+\int_\Omega u\Delta v\mathrm{d}{V}  =  \oint_{\partial\Omega} u\frac{\partial v}{\partial n}\mathrm{d}{ S }  - \int_\Omega  \nabla u\nabla v\mathrm{d}{V} 
+\end{equation}$$
+**伴随灵敏度推导**
+
+伴随变量：
+$$\pmb \theta =(\pmb{u}_a ,p_a ,T_a)$$
+
+约束函数：
+$$\pmb R=(\pmb R^u,R^p,R^T)$$
+
+增广目标函数：
+
+
+$$\begin{aligned} 
+L&=\pmb\Psi +\int_\Omega \pmb \theta \cdot \pmb{R} d\Omega \\
+&=\pmb\Psi + \int_\Omega \pmb{u}_a \cdot\Big [\Big]d\Omega + \int_\Omega p_a \cdot\Big [\Big]d\Omega + \int_\Omega T_a \cdot{}\Big [\Big]d\Omega \
+\end{aligned}$$ 
+
+
+
+
+
+
+
+
+
 
 
 
