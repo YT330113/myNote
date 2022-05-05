@@ -1038,30 +1038,52 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 ---
 
 **微分算子相关**
+
+0. 重要发现 ：
+   
+$$(\mathbf{v\cdot\nabla})\mathbf{u=\nabla u}^T\cdot \mathbf{v=v\cdot\nabla u}$$
+
 1. 对标量场而言，左梯度与右梯度相等。
 
 $$\nabla\phi=\phi\nabla$$
 
-2. 对矢量场而言，左梯度不等于右梯度，左梯度等于右梯度的转置
+2. 对矢量场而言，左梯度等于右梯度的转置
 
 $$\nabla\bf U=(\boldsymbol{\mathbf{U}} \mathrm{\nabla})^\mathrm T$$
 
-3. 对于向量场：（应该是常向量场）
+3. 对于三维区域$\Omega$中的向量场：向量的左右散度相等
 
 $$\nabla\cdot\bf U=\boldsymbol{\mathbf{U}} \cdot\mathrm{\nabla}$$
 
+4. $$\nabla f=\frac{\partial f}{\partial n}\cdot \bf n$$
+
+5. $$\nabla \cdot(f\mathbf A) =f(\nabla \cdot \mathbf A)+\mathbf A \cdot (\nabla f)$$
 **牛顿-莱布尼茨公式的高维扩展**
 $$\begin{equation}
 \int  \boldsymbol\nabla  f  \,\mathrm{d}{V}  = \oint f  \,\mathrm{d}{ \boldsymbol{\mathbf{s}} } 
 \end{equation}$$
 
+6. 张量与向量点积：
+
+$$a\cdot A=A^T\cdot a$$
+
 该公式类似于散度定理，但被积函数变为标量而不是矢量．对于一维情况，该式就是牛顿—莱布尼兹公式.
+
+7.  $\nabla(A\cdot a)$等公式：
+
+$$\nabla \cdot(A\cdot a)=(\nabla \cdot A)\cdot a+A:(a\nabla)$$
+
+$$\nabla\cdot(\mathbf{f} \mathbf{g})=(\nabla \cdot \mathbf{f})\mathbf{g}+(\mathbf{f\cdot \nabla }) \mathbf{g} $$
+
+8. 张量左右散度：
+
+$$\nabla \cdot A^T=A\cdot \nabla$$
 
 **分部积分的高维拓展**
 1. 标量分部积分
 
 $$\begin{equation}
-\int ( \boldsymbol\nabla  f) g  \,\mathrm{d}{V}  = \oint fg  \,\mathrm{d}{ \boldsymbol{\mathbf{s}} }  - \int f ( \boldsymbol\nabla  g)  \,\mathrm{d}{V} 
+\int ( \boldsymbol\nabla  f) g  \,\mathrm{d}{V}  = \oint fg  \,\mathrm{d}{ \boldsymbol{\mathbf{S}} }  - \int f ( \boldsymbol\nabla  g)  \,\mathrm{d}{V} 
 \end{equation}$$
 
 2. 矢量分部积分
@@ -1081,7 +1103,7 @@ $$\pmb \theta =(\pmb{u}_a ,p_a ,T_a)$$
 约束函数：
 $$\pmb R=(\pmb R^u,R^p,R^T)$$
 
-增广目标函数：
+增广目标函数：（这是个泛函）
 
 
 $$\begin{aligned} 
