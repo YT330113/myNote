@@ -81,8 +81,12 @@ $FOAM_RUN：用户算例目录，存放算例---run
 
 **离散**：
 ddt：时间项
+
 laplacian：扩散项
-div：对流项
+
+div：对流项。`div`操作符表面看，是计算散度的，实际上，在OpenFAOM中，`div` 操作符的作用是加和，比如说 $\nabla \cdot (UU)$，在OpenFOAM中表示为`fvm::div(phi,U)`，这段代码真正执行的是$\sum_f U_f \phi_f$运算，即将每个网格包含的面上的流率与速度乘积，然后再加起来
+
+div(phi,U): `phi is actually the flux through the cells (so it is not a volVectorField, but a surfaceScalarField). For incompressible solver phi=U, but in case of compressible flows, phi=rho*U. This is why phi is used, you only change its definition in createFields.`
 
 
 **求解器基本架构:**
@@ -1025,6 +1029,21 @@ fvm的作用是产生一个矩阵。PDEs在求解的过程中需要转化为线�
 
 fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符）将场量离散，返回的是fvMatrix，而fvc中的函数则是显式调用，返回仍然是场量。
 
+**openfoam中的放松、松弛**
+
+>【迭代所得值】=【松弛后的值】 = （1-α）*【旧值】+ α *【新值】,若不进行松弛，则α = 1,【迭代所得值】= 【新值】,也就是没有进行松弛操作。
+
+两种松弛方式：
+
+- matrix relax是使得计算结果更慢的趋向于真实值，但换来一个对角占优矩阵
+
+- field relax是使得计算结果更慢的趋向于真实值
+两个都使得计算结果更慢的趋向于真实值。
+
+涉及到 `fvSolution` 里的`alpha`，也叫`亚松驰因子`
+
+`UEqn.relax()` ，即使松弛因子是1，其实也会对 UEqn 的 系数矩阵进行一些调整，以使它更满足对角占优。fvSolution 里面如果没有定义松弛因子，则默认值为1。
+
 **cfd 中的数值耗散**
 
 差分方程是微分方程的逼近，但二者之间总有误差。误差由阶次不同，可造成解的耗散和频散，其中耗散就如给流场添加了人为的粘性一样，使得本来尖锐的突越变得平滑，分辨率降低。
@@ -1039,7 +1058,7 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 
 **微分算子相关**
 
-0. 重要发现 ：
+1. 重要发现 ：
    
 $$(\mathbf{v\cdot\nabla})\mathbf{u=\nabla u}^T\cdot \mathbf{v=v\cdot\nabla u}$$
 
