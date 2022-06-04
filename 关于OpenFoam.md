@@ -1035,14 +1035,41 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 
 两种松弛方式：
 
-- matrix relax是使得计算结果更慢的趋向于真实值，但换来一个对角占优矩阵
+>显示松弛和隐式松弛，显性松弛直接作用于求解所得变量，隐式松弛作用于系数矩阵。
 
-- field relax是使得计算结果更慢的趋向于真实值
+- matrix relax (equation relax)是使得计算结果更慢的趋向于真实值，但换来一个对角占优矩阵
+
+- field relax 是使得计算结果更慢的趋向于真实值,alpha越小，迭代值的波动越小，但收敛速度降低
 两个都使得计算结果更慢的趋向于真实值。
 
 涉及到 `fvSolution` 里的`alpha`，也叫`亚松驰因子`
 
 `UEqn.relax()` ，即使松弛因子是1，其实也会对 UEqn 的 系数矩阵进行一些调整，以使它更满足对角占优。fvSolution 里面如果没有定义松弛因子，则默认值为1。
+
+当求解过程采用定常计算时可以在/system/fvSolution里设置松弛因子，如
+```cpp
+relaxationFactors
+{
+    fields
+    {
+        p                   0.3;
+    }
+    equations
+    {
+        U                   0.7;
+        k                   0.7;
+        epsilon             0.7;
+    }
+}
+```
+
+**simpleFOAM湍流相关**
+
+- `MRF`：relates to rotating framework
+
+- `turbulence->divDevReff(U)`:返回包含涡粘性系数的拉普拉斯项fvmartic
+
+- `turbulence->correct（）`：速度修正后，用来修正该时刻的湍流量
 
 **cfd 中的数值耗散**
 
@@ -1055,6 +1082,16 @@ fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符
 可以缩放、旋转已生成的网格
 
 ---
+
+**OpwnFOAM语句**
+
+`template<class Type>` openfoam中的一个类模板，用于申明不同的类，class看作是变量的类型名，该变量接受类型作为其值，把Type看作是该变量的名称。
+
+`tmp<Field<Type>>`,tmp为of中的一类模板，可实现调用后自动释放内存，在程序中应用广泛。
+
+`db()`数据库
+
+
 
 **微分算子相关**
 
