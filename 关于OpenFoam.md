@@ -1091,7 +1091,12 @@ relaxationFactors
 
 `db()`数据库
 
+`pEqn.setReference(pRefCell, pRefValue);`
+Actually when solving a Navier-Stokes problem, the pressure field is off by an additive constant. Most of the time, this constant is determined by a fixed value boundary condition. However, in some case (periodic conditions for instance) the boundary conditions are of no use to fix this constant and in order to help the convergence, the trick consists to arbitrarily set a reference value to a cell of the mesh. So usually, the value of p at a refCell is set to pRefValue (usually 0).
 
+**This line is only used if there is no fixedValue boundary condition in the domain. You can set up the value of pRefCell and pRefValue in fvSolution.**
+
+If you remove this line and the pressure field is no fixed somewhere, then you will face tough convergence problem.
 
 **微分算子相关**
 
