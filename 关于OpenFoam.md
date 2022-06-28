@@ -830,6 +830,10 @@ int main(int argc, char *argv[])
     return(0); //返回0
 }
 ```
+例4：simpleFoam详解
+---
+
+https://blog.csdn.net/CloudBird07/article/details/107722019
 
 ---
 
@@ -1085,18 +1089,84 @@ relaxationFactors
 
 **OpwnFOAM语句**
 
-`template<class Type>` openfoam中的一个类模板，用于申明不同的类，class看作是变量的类型名，该变量接受类型作为其值，把Type看作是该变量的名称。
+- `template<class Type>` 
 
-`tmp<Field<Type>>`,tmp为of中的一类模板，可实现调用后自动释放内存，在程序中应用广泛。
 
-`db()`数据库
+openfoam中的一个类模板，用于申明不同的类，class看作是变量的类型名，该变量接受类型作为其值，把Type看作是该变量的名称。
 
-`pEqn.setReference(pRefCell, pRefValue);`
+- `tmp<Field<Type>>`
+
+tmp为of中的一类模板，可实现调用后自动释放内存，在程序中应用广泛。
+
+- `db()` 数据库
+
+- `pEqn.setReference(pRefCell, pRefValue);`
+
 Actually when solving a Navier-Stokes problem, the pressure field is off by an additive constant. Most of the time, this constant is determined by a fixed value boundary condition. However, in some case (periodic conditions for instance) the boundary conditions are of no use to fix this constant and in order to help the convergence, the trick consists to arbitrarily set a reference value to a cell of the mesh. So usually, the value of p at a refCell is set to pRefValue (usually 0).
 
 **This line is only used if there is no fixedValue boundary condition in the domain. You can set up the value of pRefCell and pRefValue in fvSolution.**
 
 If you remove this line and the pressure field is no fixed somewhere, then you will face tough convergence problem.
+
+- simpleControl.H
+
+主要的函数为loop()函数，检查当前时间步是否满足收敛条件，如满足，返回迭代终止，否则存储当前时间步中场的数据
+```cpp
+bool Foam::simpleControl::loop()
+{
+    read();     //读取controlDict中的数据，如nNonOrthCorr_，momentumPredictor_，transonic_等
+
+    Time& time = const_cast<Time&>(mesh_.time());
+
+    if (initialised_)
+    {
+        if (criteriaSatisfied())    //满足收敛条件，局部残差，总体残差
+        {
+            Info<< nl << algorithmName_ << " solution converged in "
+                << time.timeName() << " iterations" << nl << endl;
+
+            // Set to finalise calculation
+            time.writeAndEnd(); //Write the objects now (not at end of iteration) and end                                   the run
+        }
+        else
+        {
+            storePrevIterFields();  //把当前迭代步的场存储
+        }
+    }
+    else
+    {
+        initialised_ = true;
+        storePrevIterFields();
+    }
+
+
+    return time.loop();
+}
+```
+
+- createControl.H
+
+```cpp
+ #if defined(NO_CONTROL)
+ #elif defined(PISO_CONTROL)
+     #include "createPisoControl.H"
+ #elif defined(PIMPLE_CONTROL)
+     #include "createPimpleControl.H"
+ #elif defined(SIMPLE_CONTROL)
+     #include "createSimpleControl.H"
+ #endif
+```
+
+- 如果需要去掉某个volScalarFiled变量的量纲，可以使用命令p.dimensions().reset(dimless)，其中p为volScalarFiled类型的变量。
+
+- Info<< "Normalising E : E/rho\n" << endl;
+
+solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除以rho
+
+- 报错：
+ #0 Foam::error::printStack(Foam::Ostream&)
+ 
+ You encountered a program error. Upon hitting that error OpenFOAM produced a stack trace (a list of the functions that were called) which is very useful to find the location at which the problem occured. It is possible to get that stack-trace with the source files and the line numbers of the functions which might help to find out what the problem is. To do so you have to compile a debug version of OpenFOAM. (see also the segmentation fault-question above) 
 
 **微分算子相关**
 
