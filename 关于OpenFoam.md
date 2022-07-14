@@ -1087,7 +1087,8 @@ relaxationFactors
 
 ---
 
-**OpwnFOAM语句**
+OpwnFOAM语句
+---
 
 - `template<class Type>` 
 
@@ -1166,7 +1167,33 @@ solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除�
 - 报错：
  #0 Foam::error::printStack(Foam::Ostream&)
  
- You encountered a program error. Upon hitting that error OpenFOAM produced a stack trace (a list of the functions that were called) which is very useful to find the location at which the problem occured. It is possible to get that stack-trace with the source files and the line numbers of the functions which might help to find out what the problem is. To do so you have to compile a debug version of OpenFOAM. (see also the segmentation fault-question above) 
+ You encountered a program error. Upon hitting that error OpenFOAM produced a stack trace (a list of the functions that were called) which is very useful to find the location at which the problem occured. It is possible to get that stack-trace with the source files and the line numbers of the functions which might help to find out what the problem is. To do so you have to compile a debug version of OpenFOAM. (see also the segmentation fault-question above)
+
+ 
+  **correctBoundaryConditions函数**
+
+`correctBoundaryConditions`
+这个函数的作用非常简单。比如你通过下面的代码计算速度场：
+
+`U=Ua+Ub;`
+
+在这种情况下并没有计算U的边界条件，因此你需要
+
+`U.correctBoundaryConditions()`
+
+但是如果你通过UEqn.solve()的方式计算，`solve()`函数里面自动调用了`correctBoundaryConditions`。
+
+多相流求解器里面也一样，比如
+```cpp
+// Correct p_rgh for consistency with p and the updated densities
+    p_rgh = p - rho*gh;
+    p_rgh.correctBoundaryConditions();
+```
+
+是因为前面存在赋值 `p_rgh = p - rho*gh;`
+
+因此，我的个人习惯是，如果是solve()出来的，不需要调用，如果是=赋值出来的，都需要correctBoundaryConditions。
+ 
 
 **微分算子相关**
 
