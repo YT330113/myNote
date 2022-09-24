@@ -29,7 +29,9 @@ printf("%lf\n",a); //用格式符%lf输出a: lf表示是double型
 - 名字空间namespace.
 为防止名字冲突(出现同名),C++引入了名字空间( namespace)，
 通过::运算符限定某个名字属于哪个名字空间
->#include <cstdio>
+
+```cpp
+#include <cstdio>
 namespace first
 {
 int a;
@@ -38,7 +40,7 @@ int g(){/*...*/}
 }
 namespace second
 {
-    double a;
+double a;
 double f(){/*...*/}
 char g;
 }
@@ -52,6 +54,9 @@ printf("%d\n",first::a);
 printf("%lf\n",second::a);
 return 0;
 }
+```
+
+
 
 - C++的新的输入输出流库(头文件iostream)将输入输出看成一个流，并用
 输出运算符 << 和输入运算符 >> 对数据(变量和常量进行输入输出);
@@ -139,6 +144,9 @@ int main (){
 }
 ```
 - 访问和内部作用域变量同名的全局变量，要用全局作用域限定` :: `
+
+==::是全局作用域限定符，cout<< :: a表示输出全局变量a，全局变量指在main函数前定义的变量，通常指常量==
+
 ```cpp
 #include <iostream>
 using namespace std;
@@ -151,6 +159,8 @@ return 0;
 }
 ```
 - C++引入了**引用类型**，即一个变量是另一个变量的别名,`&`符号
+
+==引用是为函数传参准备的，是指针传参的升级版==
 
 ```cpp
 #include <iostream>
@@ -242,6 +252,7 @@ return 0;
 ```
 - 内联函数
   
+
 对于不包含循环的简单函数，建议用`inline`关键字声明 为**inline内联函数**，编译器将内联函数调用用其代码展开，称为“内联展开”，避免函数调用开销，提高程序执行效率
 ```cpp
 #include <iostream>
@@ -1158,7 +1169,6 @@ int main() {
 ```
 - 所有类成员函数都可以在外部定义，但要在类内部申明，在外部定义类成员函数时要加类作用域限定符`::`。
   
-
 - 类模板：我们可以将一个类变成“类模板”或“模板类”，正如一个模板函数一样。
 
 ```cpp
