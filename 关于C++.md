@@ -1,12 +1,67 @@
-- typedef：取别名
-int Typename;
-typedef int Typename; Typename=int
+# C++学习
 
-- <*.h>表示优先中系统目录中查找 该头文件  比如#include <stdio.h>  这是系统中的
-- "*.h"表示优先从当前目录中查找  该头文件  比如#include "head.h"   这是你自己写的
+## 侯捷
+
+- Header头文件的正规写法 **（防卫式声明）**
+  - 告诉编译器，如果不曾定义过这个名词的话就把它定义出来，同一个程序第二次引入时因为已经定义过了所以就不会再定义一次。
+
+  - 例如：complex.h
+
+```cpp
+//头文件正规写法
+
+#ifndef _COMPLEX_
+#define _COMPLEX_
+
+...
+
+#endif
+```
+
+- 构造函数
+
+```cpp
+class complex
+{
+public:
+    complex (double r=0,double i=0)     //默认参数
+                                        //构造函数
+        : re (r),im (i)                 //初始列，在声明阶段初始化，相当于在函数体内赋值，但更快
+    { }
+private:
+    double re, im;
+}
+```
+
+---
+
+## 复杂类型声明（指针数组等）
+
+![原理](image/截图 2022-09-28 09-46-06.png)
+
+![指针数组](image/截图 2022-09-28 09-46-51.png)
+
+![数组指针](image/截图 2022-09-28 09-47-08.png)
+
+![函数指针](image/截图 2022-09-28 09-47-42.png)
+
+![函数指针数组](image/截图 2022-09-28 09-47-56.png)
+
+![原理](image/截图 2022-09-28 09-48-39.png)
+
+---
+
+- typedef：取别名
+  ```cpp
+  int Typename;
+  typedef int Typename; Typename=int
+  ```
+  
+- <*.h>表示优先中系统目录中查找 该头文件  比如`#include <stdio.h> ` 这是系统中的
+- "*.h"表示优先从当前目录中查找  该头文件  比如`#include "head.h"  ` 这是你自己写的
 
 - 文件布置
-在 OpenFOAM 中，所有代码都以注释段开头，使用有限体积的 CFD 类型文件都包括以下头文件:
+  在 OpenFOAM 中，所有代码都以注释段开头，使用有限体积的 CFD 类型文件都包括以下头文件:
 
  `#include "fvCFD.H"` 在此头文件种，仅包含类或函数的定义，函数的内容会在运行时以动态形式调用。
 
@@ -41,7 +96,11 @@ EXE_LIBS = \
 
 在 c++ 代码中，必须包含 main 函数的实例，并且程序执行时是从此函数开始。在 c++ 的 main 函数中，使用以下参数并返回一个整数
 
-> int main(int argc, char *argv[])
+```cpp
+int main(int argc, char *argv[])
+```
+
+
 
 ---
 c++ 编程基础
@@ -78,6 +137,7 @@ vodi change(double& x1)
 
 - >void changeWord(const string& s)  
   
+
 定义函数时可以给定参数的默认值，在函数调用时可以减少此参数的值。
 
 - 类型
@@ -227,6 +287,6 @@ OpenFOAM 广泛使用模板，为了使代码易读性更好，通常将模板�
 typedef List<vector> vectorList;
 上面代码将 vectorList 定义为 vector 数据类型的模板 List 类的别名。
 
-  ---
+---
   - 一般函数形参能申明为const型的情况下应尽可能声明为const型。
   - 
