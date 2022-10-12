@@ -233,7 +233,7 @@ return 0;
 当实参占据内存大时，用引用代替传值（需要复制）可提高效率
 
 **不希望形参改变实参的值时**
-如果不希望因此无意中修改实参，可以在形参前面加一个const修改符，const表示不可修改、常数
+如果不希望因此无意中修改实参，可以在形参前面加一个==const修改符==，const表示不可修改、常数
 
 ```cpp
 #include <iostream>
@@ -269,7 +269,7 @@ cout << sqrt(k * k + m * m) << endl;
 return 0;
 }
 ```
-- 通过 `try-catch`处理异常情况
+- 通过 `try-catch`处理==异常==情况
 
 正常代码放在try函数块，catch函数快中捕获try块抛出的异常
 
@@ -382,13 +382,13 @@ struct Vector2{
 double x;
 double y;
 };
-Vector2 operator * (double a, Vector2 b){       //相当于定义了一个数乘以一个向量
+Vector2 operator*(double a, Vector2 b){       //相当于定义了一个数乘以一个向量
 Vector2 r;
 r.x = a * b.x;
 r.y = a * b.y;
 return r;
 }
-Vector2 operator+ (Vector2 a, Vector2 b) {      //相当于定义了两向量相加
+Vector2 operator+(Vector2 a, Vector2 b) {      //相当于定义了两向量相加
 Vector2 r;
 r.x = a.x + b.x;
 r.y = a.y + b.y;

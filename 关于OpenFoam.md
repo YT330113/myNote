@@ -1,3 +1,19 @@
+# 关于OpenFOAM
+
+## OpenFOAM网上学习资料
+
+[openfoam和面向对象C++看这一篇就够了](https://zhulianhua.github.io/documents/objectOrientation.pdf)
+
+[最全OpenFOAM 学习资料 | Lianhua Zhu's Blog (zhulianhua.github.io)](https://zhulianhua.github.io/2016/09/28/OpenFOAM-Learning-Resources/)
+
+- 苏军伟博客 http://blog.sina.com.cn/openfoamresearch
+这显然是最常见的入门学习材料之一了，内容很多，比较全面。
+- 东岳流体 http://dyfluid.com/
+李东岳的网站，有求解器的详细资料（其实对初学者感觉还是不够详细）。比较其余两个更学术一些。还有一些OF之外的流体力学资料。
+- 戴得志的笔记 https://www.zybuluo.com/daidezhi/note/391186
+最近（2019.06.13）才发现的一套笔记，流程比较清楚，目的是自定义（并编译使用）求解器，中间的各个步骤都有讲解。内容似乎不是很多，好像作者不是专门做这个的。
+- 流沙CAE https://www.cfder.club/
+胡坤的博客。之前似乎是在新浪有一个博客的，这个应该是新的。整个博客都是偏工程应用的感觉，这个系列中的OF内容较少，也比较浅显。不过也有一些资料索引，而且也是成体系的一个博客，所以也列在这里。
 - 东岳流体：http://dyfluid.com/
 - CFD中的张量公式：http://dyfluid.com/docs/tensor.html
 - OpenFOAM里面3个最基本的求解器：
@@ -12,17 +28,8 @@
 
 - 计算流体力学 ：https://www.zhihu.com/collection/747809765
 
-**OpenFOAM网上学习资料**
-- 苏军伟博客 http://blog.sina.com.cn/openfoamresearch
-这显然是最常见的入门学习材料之一了，内容很多，比较全面。
-- 东岳流体 http://dyfluid.com/
-李东岳的网站，有求解器的详细资料（其实对初学者感觉还是不够详细）。比较其余两个更学术一些。还有一些OF之外的流体力学资料。
-- 戴得志的笔记 https://www.zybuluo.com/daidezhi/note/391186
-最近（2019.06.13）才发现的一套笔记，流程比较清楚，目的是自定义（并编译使用）求解器，中间的各个步骤都有讲解。内容似乎不是很多，好像作者不是专门做这个的。
-- 流沙CAE https://www.cfder.club/
-胡坤的博客。之前似乎是在新浪有一个博客的，这个应该是新的。整个博客都是偏工程应用的感觉，这个系列中的OF内容较少，也比较浅显。不过也有一些资料索引，而且也是成体系的一个博客，所以也列在这里。
+## openfoam中的边界条件
 
-**openfoam中的边界条件**
 1. 几何边界条件（体现在`constant/polyMesh/boundary`）
 
 - wall
@@ -40,6 +47,8 @@
 - symmetry
 - cyclic
 - coded...
+
+## 文件解析
 
 **OpenFOAM中 controlDict 字典文件解析**https://www.zybuluo.com/daidezhi/note/391186
 
@@ -60,67 +69,556 @@
 
  **openfoam里的网格对象fvMesh** https://zhulianhua.github.io/2016/10/06/of-fvMesh/
 
-  **复杂初边值处理方案**：https://zhuanlan.zhihu.com/p/381296788
+##   **复杂初边值处理方案**：
 
+ https://zhuanlan.zhihu.com/p/381296788
 
- **几个环境变量：**
+##  几个环境变量：
 
-  
-$FOAM_TUTORIALS：OpenFOAM算例目录,包含所有OpenFOAM官方教程算例---tut
+`$FOAM_TUTORIALS`：OpenFOAM算例目录,包含所有OpenFOAM官方教程算例---tut
 
-$FOAM_SRC：OpenFOAM总库源代码目录，finiteVolume、mesh等库源代码目录---src
+`$FOAM_SRC`：OpenFOAM总库源代码目录，finiteVolume、mesh等库源代码目录---src
 
-$FOAM_APP：OpenFOAM应用源代码目录，包含solvers、test和utilities（已经编译好的)---app
+`$FOAM_APP`：OpenFOAM应用源代码目录，包含solvers、test和utilities（已经编译好的)---app
 
-$FOAM_APPBIN：（platforms文件夹下）OpenFOAM标准应用目标代码目录，在make文件夹下的file文件里指定生成exe文件的位置就是这里(存放求解器目录和库的目录)
+`$FOAM_APPBIN`：（platforms文件夹下）OpenFOAM标准应用目标代码目录，在make文件夹下的file文件里指定生成exe文件的位置就是这里(存放求解器目录和库的目录)
 
-$(FOAM_USER_APPBIN):用户自定义求解器编译后生成的可执行程序exe和库lib的位置，在openfoan/yantao-6/platforms...下
+`$(FOAM_USER_APPBIN)`:用户自定义求解器编译后生成的可执行程序exe和库lib的位置，在openfoan/yantao-6/platforms...下
 
-$FOAM_RUN：用户算例目录，存放算例---run
+`$FOAM_RUN`：用户算例目录，存放算例---run
 
+## 离散：
 
-**离散**：
 ddt：时间项
 
 laplacian：扩散项
 
 div：对流项。`div`操作符表面看，是计算散度的，实际上，在OpenFAOM中，`div` 操作符的作用是加和，比如说 $\nabla \cdot (UU)$，在OpenFOAM中表示为`fvm::div(phi,U)`，这段代码真正执行的是$\sum_f U_f \phi_f$运算，即将每个网格包含的面上的流率与速度乘积，然后再加起来
 
-div(phi,U): `phi is actually the flux through the cells (so it is not a volVectorField, but a surfaceScalarField). For incompressible solver phi=U, but in case of compressible flows, phi=rho*U. This is why phi is used, you only change its definition in createFields.`
+div(phi,U): 
 
+> phi is actually the flux through the cells (so it is not a volVectorField, but a surfaceScalarField). For incompressible solver phi=U, but in case of compressible flows, phi=rho*U. This is why phi is used, you only change its definition in createFields.
 
-**求解器基本架构:**
-newApp.C		newApp求解器顶层源代码
-createFields.H		变量场的声明和初始化
-files			按行存储所有源代码文件名(c文件)，最后一行用来指定目标代码EXE的名称和存放位置
-options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LIBS，对于链接的 单个 库文件，必须通过标示符-l指定，并且去掉lib前缀以及.so后缀，例如：libnew.so，应该使用-lnew。
+## 求解器基本架构:
 
-**openfoam中的数据类型**
+**newApp.C**		newApp求解器顶层源代码
+**createFields.H**		变量场的声明和初始化
+**files**			按行存储所有源代码文件名(c文件)，最后一行用来指定目标代码EXE的名称和存放位置
+**options**			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LIBS，对于链接的 单个 库文件，必须通过标示符-l指定，并且去掉lib前缀以及.so后缀，例如：libnew.so，应该使用-lnew。
+
+## openfoam中的数据类型
+
 - 基础：标量 scalar, 向量 vector, 张量 tensor，对错型 bool，整形 label
-- 场 field class类：typedef field<scalar> saclarField，typedef field<vector> vectorField,typedef field<tensor> tensorField
-- 几何场类 GeometricField class:volScalarField 体标量场，volVectorField 体向量场，volTensorField 体张量场; 相比 field class 多了纪录场位置 的相关信息,记录了在什么样的网格上有量 a 的相关信息或数据.
 
-**编写自己的求解器**
+- 场 **field class**类：
+
+  ```cpp
+  typedef field<scalar> saclarField;
+  typedef field<vector> vectorField;
+  typedef field<tensor> tensorField
+  ```
+
+- 几何场类 **GeometricField class**:
+
+  ```cpp
+  volScalarField 体标量场;
+  volVectorField 体向量场;
+  volTensorField 体张量场; 
+  ```
+
+  相比 field class 多了纪录场位置 的相关信息,记录了在什么样的网格上有量 a 的相关信息或数据.
+
+## OpenFOAM 场（field）的操作和运算 
+
+### 几个常见的类：
+
+```cpp
+volScalarField
+volVectorField
+surfaceScalarField
+surfaceVectorField
+```
+
+其实它们都是别名，定义如下：
+
+```cpp
+typedef GeometricField<scalar, fvPatchField, volMesh> volScalarField;
+typedef GeometricField<vector, fvPatchField, volMesh> volVectorField;
+typedef GeometricField<scalar, fvsPatchField, surfaceMesh> surfaceScalarField;//src/finiteVolume/fields/surfaceFields/surfaceFieldsFwd.H
+typedef GeometricField<vector, fvsPatchField, surfaceMesh> surfaceVectorField;
+```
+
+发现，它们实际上都是 `GeometricField`，不过是提供的模板不同。首先我们看到它需要三个模板：`<Type,PatchField,GeoMesh>`。结合 `volScalarField` 和 `surfaceScalarField` 的定义，我们不难发现：第一个 `Type `可以是` scalar` `vecto`r 等，第二个` PatchField `可以是 `fvPatchField` `fvsPatchField`（**这里的 s 表示 surface**）等，第三个 `GeoMesh` 可以是` volMesh` `surfaceMesh` 等。
+
+- `GeometricField`–**场 + 网格**，包含**内部场及其边界场**，边界场是场的场（FieldField）
+- `DimensionedField`–带单位的场，**只有内部场，没有边界场**
+- `Field`–数组（即 List）+ 代数操作
+
+### field相关类的用法
+
+**field类对象的两种构造**
+
+```cpp
+volScalarField A_
+(
+    IOobject
+    (
+        "A", //字典名字
+        mesh.time().timeName(), //字典位置
+        mesh, //字典注册对象
+        IOobject::MUST_READ, // MUST_READ_IF_MODIFIED  NO_READ READ_IF_PRESENT
+        IOobject::AUTO_WRITE // NO_WRITE
+        true //默认是注册
+    ),
+    mesh
+)
+
+volScalarField B_                         
+(
+    IOobject
+    (
+        "B",
+        mesh.time().timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("B", dimensionSet(1, -3, -1, 0, 0, 0, 0), 0.)  
+    // 中间的量纲还可以这样：dimless，或者 dimMass/dimVolume
+)
+```
+
+上述两种构造函数对应 `GeometricField` 源代码中的：
+
+`````cpp
+GeometricField(const IOobject&,const Mesh&);
+GeometricField(const IOobject&,const Mesh&,const dimensioned<Type>&,const word& patchFieldType=PatchField<Type>::calculatedType());
+`````
+
+第一种是从文件中读取，**内部场和边界场的初始值都由文件给定，边界条件也由文件给定**。
+
+第二种不需要从文件中读取，**内部场和边界场的初始值都是这里给定**的 0，**边界条件默认是 calculated。也可以指定边界条件类型**，如：
+
+```cpp
+volScalarField C_                         
+(
+    IOobject
+    (
+        "C",
+        mesh.time().timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("C", dimensionSet(1, -3, -1, 0, 0, 0, 0), 0.),
+    zeroGradientFvPatchScalarField::typeName
+)
+```
+
+### **场数据的读取**
+
+**const:**
+`Internal& internalField()`, 								有量纲的内部场
+`Internal::FieldType& primitiveField()`, 		 无量纲的内部场
+`Boundary& boundaryField()`, 								无量纲的边界场
+
+**non-const:**
+`ref()`, 																	   有量纲的内部场
+`primitiveFieldRef()`, 											无量纲的内部场
+`boundaryFieldRef()`, 											  无量纲的边界场
+
+用 `forAll `来遍历的时候，遍历的其实就是那个 `field`。
+所以总体是有量纲的，用 `forAll` 对每个 `cell` 或` face` 遍历的时候，就失去量纲了。
+
+使用举例：
+
+```cpp
+Info<<"T="<<thermo.T()<<endl; // 有量纲的 内部+边界
+Info<<"T.internalField()="<<thermo.T().internalField()<<endl; // 有量纲的 内部+边界
+Info<<"T.primitiveField()="<<thermo.T().primitiveField()<<endl; // 无量纲的 内部
+Info<<"T.boundaryField()="<<thermo.T().boundaryField()<<endl; // 无量纲的 边界
+Info<<"T.ref()="<<thermo.T().ref()<<endl; // 有量纲的 内部+边界
+Info<<"T.primitiveFieldRef()="<<thermo.T().primitiveFieldRef()<<endl; // 无量纲的 内部
+Info<<"T.boundaryFieldRef()="<<thermo.T().boundaryFieldRef()<<endl; //无量纲的 边界
+```
+
+### 场的**操作和运算**
+
+#### DimensionedField中定义的函数
+
+- 平均
+
+```cpp
+p.average() = gAverage(p)
+```
+
+- 加权平均
+
+```cpp
+p.weightedAverage(weightField) = gSum(weightField*p)/gSum(weightField)
+```
+
+​	使用举例：
+
+```cpp
+Info<<"average p is "<<p.weightedAverage(mesh.V()).value()<<endl;  
+//全场压力的体积加权平均值
+```
+
+- 更改量纲 `dimensions()`
+
+​	使用举例：
+
+```cpp
+Z_.dimensions().reset(dimless);
+```
+
+#### GeometricField 中定义的函数
+
+- `max(), min()`
+  取最大值，包括内部场和边界场。并行计算时，Info 输出的是 master 的
+  使用举例：
+
+```c++
+Info<<"T=== "<<max(thermo.T())<<endl;
+```
+
+- `writeMinMax()`
+  **输出最小最大值**，只包括内部场。
+
+```c++
+template<class Type, template<class> class PatchField, class GeoMesh>
+void Foam::GeometricField<Type, PatchField, GeoMesh>::writeMinMax
+(
+    Ostream& os
+) const
+{
+    os  << "min/max(" << this->name() << ") = "
+        << Foam::min(this).value() << ", "
+        << Foam::max(this).value()
+        << endl;
+}
+```
+
+使用举例：
+
+```cpp
+Z_.writeMinMax(Info);
+```
+
+下面是详细的测试：
+
+T 文件：
+
+```c++
+dimensions [0 0 0 1 0 0 0];
+
+internalField uniform 900;
+
+boundaryField
+{
+    walls
+    { 
+        type fixedValue;
+        value uniform 1800;
+    }
+}
+```
+
+使用举例：
+
+```cpp
+Info<<"max(T)=== "<<max(thermo.T())<<endl; //内部+边界
+Info<<"min(T)=== "<<min(thermo.T())<<endl; //内部+边界
+Info<<"max(T.internalField)=== "<<max(thermo.T().internalField())<<endl; // 内部
+Info<<"min(T.internalField)=== "<<min(thermo.T().internalField())<<endl; // 内部
+Info<<"max(T.ref)=== "<<max(thermo.T().ref())<<endl; // 内部
+Info<<"min(T.ref)=== "<<min(thermo.T().ref())<<endl; // 内部
+Info<<"max(T.boundaryField)=== "<<max(thermo.T().boundaryField())<<endl; // 边界
+Info<<"min(T.boundaryField)=== "<<min(thermo.T().boundaryField())<<endl; // 边界
+thermo.T().writeMinMax(Info); // 内部
+```
+
+输出：
+
+```c++
+max(T)=== max(T) [0 0 0 1 0 0 0] 1800
+min(T)=== min(T) [0 0 0 1 0 0 0] 900
+max(T.internalField)=== max(T) [0 0 0 1 0 0 0] 900
+min(T.internalField)=== min(T) [0 0 0 1 0 0 0] 900
+max(T.ref)=== max(T) [0 0 0 1 0 0 0] 900
+min(T.ref)=== min(T) [0 0 0 1 0 0 0] 900
+max(T.boundaryField)=== 1800
+min(T.boundaryField)=== 1800
+min/max(T) = 900, 900
+```
+
+- `gMax()`, max 的并行版
+
+#### FieldFunctions
+
+ 是一些底层的函数，一般用不到
+
+#### DimensionedFieldFunctions
+
+```cpp
+pow
+sqr
+magSqr
+mag
+cmptAv
+gMax
+gMin
+gSum
+gSumMag
+gAverage
++
+-
+外积
+/
+^叉乘
+&点乘，内积
+&& 双内积
+```
+
+#### GeometricFieldFunctions
+
+```cpp
+pow
+sqr
+magSqr
+mag
+cmptAv
+gMax返回的是无量纲的？
+gMin
+gSum
+gSumMag
+gAverage
++
+-
+外积
+/
+^叉乘
+&点乘，内积
+&& 双内积
+```
+
+### fvc 中的操作
+
+- `volumeIntegrate()`
+
+​	`volumeIntegrate() `的功能是对每个网格的某个物理量，乘以其网格体积，然后形成一个新的场。
+
+```cpp
+volumeIntegrate(df) = df.mesh().V()*df.field();
+```
+
+- `domainIntegrate()`
+
+​	`domainIntegrate()` 的功能是对某个物理量，乘以其网格体积，然后对所有网格求和。
+
+```cpp
+domainIntegrate(df) = gSum(fvc::volumeIntegrate(df));
+```
+
+​	这里的` gSum` 是对全场求和。
+
+- 其它 fvc 中的操作
+
+```cpp
+surfaceIntegrate
+surfaceSum
+Su
+Sp
+SuSp
+snGrad
+reconstruct
+laplacian
+grad
+flux
+div
+DDt
+curl
+average
+cellReduce
+```
+
+### 总结
+
+1. `Field`是最基础的域，它继承了`List`的一维数组的结构用来存储域的元素;
+2. `DimensionedField`则是继承自`Field`，它在`Field`的基础上添加了和**网格**Mesh相关以及文件流`regIOobject`相关的量
+3. `GeometricField`则是继承自`DimensionedField`，它又在DimensionedField的基础上添加了和**边界**相关的量以及时间戳，并建立了不同时间戳下的域之间的联系。
+4. 最终通过`GeometricField`的`template`模板中的类型指定为特定类型，定义出我们平时使用的域的类型
+
+---
+
+## OpenFOAM 网格对象
+
+### 1. 创建网格对象
+
+```cpp
+ #include "createMesh.H"
+// createMesh.H
+// ~~~~~~~~~~~~
+    Foam::Info
+        << "Create mesh for time = "
+        << runTime.timeName() << Foam::nl << Foam::endl;
+    Foam::fvMesh mesh // 创建网格对象 mesh
+    (
+        Foam::IOobject
+        (
+            Foam::fvMesh::defaultRegion,
+            runTime.timeName(),
+            runTime,
+            Foam::IOobject::MUST_READ
+        )
+    );
+```
+
+### 2. 网格类对象成员函数
+
+```cpp
+const scalarField& V = mesh.V(); // 返回cell volume列表
+const vectorField& C = mesh.C(); // cell center coordinate
+const vectorField& Cf = mesh.Cf(); // face center coordinate
+const vectorField& Sf = mesh.Sf(); // face normal
+const labelUList& owner = mesh.owner(); // ！！！注意是所有内部面的owner！
+const labelUList& neighbour = mesh.neighbour();// 内部面的neighbor
+// 如何知道边界面的owner呢？要知道边界面是属于fvBoundaryMesh类的
+
+```
+
+**那如何知道边界面的owner呢？**要知道边界面是属于`fvBoundaryMesh`类的
+
+```cpp
+// loop over boundary faces, except empty boundaries
+// mesh.boundary()返回的对象类类型是fvBoundaryMesh
+forAll(mesh.boundary(), patchi) //这里对每个bounary patch循环，mesh.boundary()返回boundary patch的数组（大面），不包含empty类型的boundary patch。
+{
+    // faceCells()函数返回每个patch的每个face的owner是哪个单元
+    const labelUList& pOwner = mesh.boundary()[patchi].faceCells(); 
+    forAll(pOwner, facei)
+    {
+        Info << "Boundary patch #" << patchi
+            << "'s face " << "#" << facei << "'s owner cell : "
+            <<  pOwner[facei] << endl;
+    }
+}
+```
+
+==注意==：`mesh.boundary()`返回的对象类类型是`fvBoundaryMesh`
+
+除了`faceCell()`函数外，还可以获取boundary patch的更多信息，比如`name()`，`start()`（该patch第一个face中在所有的face中的位置）。
+
+fvPatch指的就是我们说的boundary patch，其Access类型的函数可以返回诸多我们感兴趣的数据
+
+```cpp
+...
+         //- Return name
+         const word& name() const
+         {
+             return polyPatch_.name();
+         }
+         ...
+         //- Return size
+         virtual label size() const
+         {
+             return polyPatch_.size();
+         }
+         ...
+     // Access functions for geometrical data
+         //- Return face centres
+         const vectorField& Cf() const;
+         //- Return neighbour cell centres
+         tmp<vectorField> Cn() const;
+         //- Return face area vectors
+         const vectorField& Sf() const;
+         ...
+```
+
+有时候在写后处理程序时希望通过boundary patch的名字找到boundary patch的编号，这可以通过fvBondaryMesh提供的`findPatchID()`函数实现，`findPatchID()`函数申明：
+
+```cpp
+//- Find patch index given a name
+label findPatchID(const word& patchName) const; // 返回某个pahch 的label
+```
+
+举个例子，如果希望找到fixedWall对应的boundary patch编号：
+
+```cpp
+// find patch ID by name
+Info << "Patch fixedWalls's patchID = " << mesh.boundary().findPatchID("fixedWalls") << endl;
+
+// 输出
+Patch fixedWalls's patchID = 1
+```
+
+---
+
+## OPenFOAM时间对象
+
+### 1. 如何查找某个头文件
+
+**1. 在`make/option`文件夹下查看**
+
+**2. 使用`find`命令在`$FOAM_SRC`目录按文件名查找**
+
+```bash
+$ find $FOAM_SRC -name setRootCase.H 
+$ FOAM_SRC/OpenFOAM/include/setRootCase.H
+$ FOAM_SRC/OpenFOAM/lnInclude/setRootCase.H # 这个文件只是第一个文件的链接（对应Windows的快捷方式）
+```
+
+**==！`lnInclude`文件夹下存的是头文件的链接 ！==**,使用`list -l`命令可以查看连接指向文件的信息
+
+```bash
+list -l --dereference # 列出符号链接指向的文件的信息，而不是符号链接本身
+```
+
+### 2. 时间对象常用成员函数
+
+```cpp
+runTime.timeName();	// 当前物理时间
+const scalar dt = runTime.deltaValue();// 访问当前步的时间步长
+Time.controlDict();// 可以访问system/controlDict下的参数,这个函数返回的是个对象
+// 例如
+// self-defined control parameter
+scalar tp =  runTime.controlDict().lookupOrDefault<scalar>("testParameter", 2.0);//读取controlDict下的testParameter参数
+Info << "testParameter = " << tp << endl;
+label ltp =  runTime.controlDict().lookupOrDefault<label>("labelTp", 2.0);//读取controlDict下的labelTp参数
+Info << "labelTp = " << ltp << endl;
+```
+
+
+
+---
+
+## 编写自己的求解器
+
 1. 创建一个空的求解器
 
 
-  ```cpp
+  ```bash
    foamNewApp mySolver
-   ```
+  ```
    调用命令自动创建一个空的求解器，这样就可以创建一个路径，里面有一个叫做mySolver.C的文件，文件里有写好的文件头和主函数的框子等等。这个源文件外头还有一个Make路径，Make里面也已经有了现成的files和options 文件了。
-   
+
    值得注意的是，这句命令最好在applications目录下运行，这样新生成的solver会和系统的求解器放在一个路径下，避免新手搞不定编译的问题。
 
 2. 创建网格对象
    
+
   实际上是根据生成的网格创建一个 ***对象***。一般不需要自己搞，只要一句话:
    ```cpp
    #include "createMesh.H"
    ```
-   这句话应该是将求解器路径下的/constant/polyMesh下的网格文件读入程序，编程一个对象。
+   这句话应该是将求解器路径下的`/constant/polyMesh`下的网格文件读入程序，编程一个对象。
 
 3. 读取初场和系数：creatFields.H
    
+
   往第二步网格上放变量和系数，就是指定每个cv里的变量是多少。在求解器里也只是一句话：
    ```cpp
    #include "createFields.H"
@@ -130,7 +628,7 @@ options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LI
    变量和系数的读入（和读出，因为有些量，不只是变量是要输出来给人看的）在of里通过对象注册机来完成。新手完全没必要琢磨这是个啥，只要知道变量和系数是这样写入写出的就vans了。
 
   (1). 读取系数
-   
+
   先读$\kappa$，仿照scalarTransportFoam的写法：
   ```cpp
    Info<< "Reading transportProperties\n" << endl;
@@ -145,7 +643,7 @@ options			设定查找头文件和库的路径EXE_INC和需要链接的库EXE_LI
         IOobject::NO_WRITE
     )
   );
-   ```
+  ```
   这一段原封不动抄进去就行。到这里是创建了一个IOdictionary的对象，叫做TransportProperties。创建的时候就用IoObject来初始化。如何初始化呢？首先从从/constant路径下的叫做"transportProperties"的文件里读入数据，这分别是IoObject里面前两行的意思。剩下的就是把这个东西注册（也就是写到）mesh上，mesh是第二步里创建出来的对象。
 
 ok，现在我们有一个对象叫做transportProperties，这个对象是IOdictionary类的，也就拥有了这个类下的各种函数。那么我们要用的就是查找具体系数的功能。虽然这个例子里只有一个系数，看上去多次一举。但是真正的求解器会有若干个系数，所以要分别处理。写入$\kappa$的语句是：
@@ -180,7 +678,7 @@ volScalarField h
 );
   ```
 
-对象注册机的写详细说明参阅资料:https://www.cfd-china.com/topic/2153/openfoam%E4%B8%AD%E7%9A%84%E6%B3%A8%E5%86%8C%E6%9C%BA%E5%88%B6%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D?lang=zh-CN https://www.dazhuanlan.com/2019/09/30/5d9197ed9f190/ https://marinecfd.xyz/post/openfoam-object-registry/#%E6%A0%91%E7%8A%B6%E7%BB%93%E6%9E%84%E7%9A%84%E7%AE%A1%E7%90%86
+[对象注册机的写详细说明参阅资料](https://www.cfd-china.com/topic/2153/openfoam%E4%B8%AD%E7%9A%84%E6%B3%A8%E5%86%8C%E6%9C%BA%E5%88%B6%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D?lang=zh-CN https://www.dazhuanlan.com/2019/09/30/5d9197ed9f190/ https://marinecfd.xyz/post/openfoam-object-registry/#%E6%A0%91%E7%8A%B6%E7%BB%93%E6%9E%84%E7%9A%84%E7%AE%A1%E7%90%86)
 
 4. 方程离散
 
@@ -223,7 +721,7 @@ fvVectorMatrix UEqn(...);
 solve(UEqn == -fvc::grad(p));
 ```
 6. 结果输出
-  
+
 每个时间步都需要把结果输出来，所以加上一句：
 ```cpp
 runTime.write();
@@ -267,7 +765,7 @@ int main()// 主函数
 接下来要做的是把源代码编程一个可执行程序。所有的solver都是可执行程序。所以需要编译。编译通过wmake即可，之前的Make文件夹就是为这个准备的。
 
 7. 编译
-  
+
 使用wmake，这个of自带的编译系统即可。因为之前我们使用foamNewApp命令生成了Make，内容都不用修改。直接在在当前求解器目录下：
 ```c
 wmake
@@ -277,11 +775,12 @@ wmake
 
 8. 运行求解器
    
+
 求解的前提是准备**网格+初场**。我不太喜欢blockMesh，又学不太会snappyHexMesh，所以网格都用商软来画，画完转换一下。这部分的内容见另一个笔记：https://www.zybuluo.com/gunshooter/note/1716545
 
-**三个求解器例子**
+## 三个求解器例子
 
-**例1：OpenFOAM>>solver>>basic>>laplacianFoam**
+### 例1：OpenFOAM>>solver>>basic>>laplacianFoam
 
 ```cpp
 //createFields.H
@@ -362,7 +861,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 //读入simple算法参数，位于
  
-src » finiteVolume » cfdTools » general » include
+// src » finiteVolume » cfdTools » general » include
  
 #       include "readSIMPLEControls.H"
 //对于网格非正交循环修正。
@@ -440,10 +939,16 @@ if (runTime.outputTime())
     runTime.write();
 }
 ```
-Tips：runTime是类Time的一个对象，runTime.timeName()其实就是当前运行到的物理时间（非稳态物理问题的时间），你程序运行到了5.1 s，runTime.timeName()就会将字符串“5.1”返回给你，OpenFOAM在对不同时刻的数据进行存取的时候就是靠着这个字符串。runTime.constant()返回的就是case下那个constant文件夹的名字，这个名字可以改的，默认为constant。OpenFOAM根据case文件夹里面的system/controlDict里面对输出的设置来确定当前时刻时候输出，如果当前时刻输出的话，outputTime()就为true，就输出数据了。
+#### Tips：
 
+runTime是类Time的一个对象，`runTime.timeName()`其实就是当前运行到的物理时间（非稳态物理问题的时间），==你程序运行到了5.1 s，`runTime.timeName()`就会将字符串“5.1”返回给你==，OpenFOAM在对不同时刻的数据进行存取的时候就是靠着这个字符串。
 
-**例2：OpenFOAM>>solver>>basic>>potentialFoam**
+`runTime.constant()`返回的就是case下那个constant文件夹的名字，这个名字可以改的，默认为constant。
+
+OpenFOAM根据case文件夹里面的system/controlDict里面对输出的设置来确定当前时刻时候输出，如果当前时刻输出的话，`outputTime()`就为true，就输出数据了。
+
+### 例2：OpenFOAM>>solver>>basic>>potentialFoam
+
 ```cpp
 //creatField.H
 
@@ -539,9 +1044,7 @@ surfaceScalarField phi
 //压力参考值
     scalar pRefValue = 0.0;
     setRefCell(p, mesh.solutionDict().subDict("SIMPLE"), pRefCell, pRefValue);
-   //只有求解区域所有的压力边界都为第二类边界条件是，上面的值才会用到。如果有第一类边界条件，
- 
-//压力参考值为这点边界值。对于不可压缩流动压力值为相对值，上面的参考值的大小对结果无影响。
+   //只有求解区域所有的压力边界都为第二类边界条件是，上面的值才会用到。如果有第一类边界条件，压力参考值为这点边界值。对于不可压缩流动压力值为相对值，上面的参考值的大小对结果无影响。
 ```
 ```cpp
 //potentialFoam.C
@@ -675,7 +1178,8 @@ if (nonOrth == nNonOrthCorr)
 return(0);
 }
 ```
-**例3：OpenFOAM>>solver>>basic>>scalarTransportFoam**
+### 例3：OpenFOAM>>solver>>basic>>scalarTransportFoam
+
 ```cpp
 //createFields.H
 
@@ -830,16 +1334,18 @@ int main(int argc, char *argv[])
     return(0); //返回0
 }
 ```
-例4：simpleFoam详解
----
+### 例4：simpleFoam详解
 
 https://blog.csdn.net/CloudBird07/article/details/107722019
 
 ---
 
+## IOobject机制
+
 **OpenFOAM中使用字典和IOobject类实现输入输出操作.一个IOobject对象在构造的时候需要六个参数：对象名称，类名称，实例路径，一个objectRegistry的引用，以及描述读写方式的参数。**
 
 **IOobject的构造函数**
+
 1. 从对象名称，实例路径，objectRegistry引用和读写设置来构造。
 
 ```cpp
@@ -884,14 +1390,14 @@ IOdictionary transportProperties
           IOobject::NO_WRITE
      )
 );
- ``` 
+ ```
 本例中使用了第一种构造函数，其中：
 
 "transportProperties" 是含有字典的文件名称。
 
  runTime.constant()实例路径，给出字典的位置，在本例中存在于算例的constant路径下。
 
- objectRegistry为mesh（前面提过polyMesh和fvMesh都是是objectRegistry的派生类）。
+ objectRegistry为mesh（前面提过==polyMesh和fvMesh都是是objectRegistry的派生类==）。
 
 **IOobject和场**
 类似于字典，对于场数据的读写设置同样也可以通过IOobject类来实现。对于各种类型的场来说，调用的语法甚至都是相同的，可以参见下面的例子。如果我们想定义一个名字叫做T的volScalarField场，并将其每个时间点计算的场数据保存下来，并放在以时间点命名的路径下，可以这样实现：
@@ -922,7 +1428,8 @@ mesh是所需的objectRegistry。
 
 
 
-**openfoam添加离心力源项**
+## openfoam添加离心力源项
+
 ```cpp
 Fcent
 
@@ -970,8 +1477,7 @@ Field<type>
 typedf Field<vector> scalarField;vectorField等等**
 ```
 
-
-**openfoam中的类继承关系：**
+## openfoam中的类继承关系：
 
 
 primitiveMesh：最底层的类，只包含网格的几何信息且不包含边界信息
@@ -993,15 +1499,14 @@ fvMesh
 
 
 
-fvMesh：由polyMesh派生而来，加入了与有限体积法相关的离散的内容。fvMesh被用来访问所有的网格功能。因此离散化类与函数的交互主要是通过fvMesh和fvPatch进行的。
+fvMesh：由polyMesh派生而来，加入了与有限体积法相关的离散的内容。***fvMesh被用来访问所有的网格功能***。因此离散化类与函数的交互主要是通过fvMesh和fvPatch进行的。
 
-内部面：polyMesh->fvMesh
-边界面：polyBoundaryMesh->fvBoundaryMesh
+**内部面：polyMesh->fvMesh**
+**边界面：polyBoundaryMesh->fvBoundaryMesh**
 
-主要是fvPatch和fvMesh类实现离散化和与函数的交互
+==主要是fvPatch和fvMesh类实现离散化和与函数的交互==
 
-
-接下来定义可以将场量与网格结合起来的类GeometricField<type,...>
+接下来定义可以***将场量与网格结合起来的类***  `GeometricField<type,...>`
   |
   |___volField<Type>
   |___surfaceField<type>
@@ -1014,7 +1519,8 @@ GeometricField<type,...>
   |___InternalField
   |___BoundaryField
 
-**fvm和fvc**
+## fvm和fvc
+
 finiteVolumeMethod，隐式离散
 finiteVolumeCalculate，显示计算
 
@@ -1033,7 +1539,7 @@ fvm的作用是产生一个矩阵。PDEs在求解的过程中需要转化为线�
 
 fvm和fvc是OpenFOAM中的两个命名空间，fvm中的函数（或称操作符）将场量离散，返回的是fvMatrix，而fvc中的函数则是显式调用，返回仍然是场量。
 
-**openfoam中的放松、松弛**
+## openfoam中的放松、松弛
 
 >【迭代所得值】=【松弛后的值】 = （1-α）*【旧值】+ α *【新值】,若不进行松弛，则α = 1,【迭代所得值】= 【新值】,也就是没有进行松弛操作。
 
@@ -1067,7 +1573,7 @@ relaxationFactors
 }
 ```
 
-**simpleFOAM湍流相关**
+## simpleFOAM湍流相关
 
 - `MRF`：relates to rotating framework
 
@@ -1075,14 +1581,14 @@ relaxationFactors
 
 - `turbulence->correct（）`：速度修正后，用来修正该时刻的湍流量
 
-**cfd 中的数值耗散**
+## cfd 中的数值耗散
 
 差分方程是微分方程的逼近，但二者之间总有误差。误差由阶次不同，可造成解的耗散和频散，其中耗散就如给流场添加了人为的粘性一样，使得本来尖锐的突越变得平滑，分辨率降低。
 
 截断项中偶数阶微分的存在使得解具有耗散性，奇数阶微分的存在使得解具有频散性。比如一道正弦曲线，耗散使之幅值变低，而频散使之相位和周期发生变化  
 
+## **`transformPoints`命令**
 
-**`transformPoints`命令**
 可以缩放、旋转已生成的网格
 
 ---
@@ -1102,6 +1608,8 @@ tmp为of中的一类模板，可实现调用后自动释放内存，在程序中
 - `db()` 数据库
 
 - `pEqn.setReference(pRefCell, pRefValue);`
+
+前面三个求解器例子里有说
 
 Actually when solving a Navier-Stokes problem, the pressure field is off by an additive constant. Most of the time, this constant is determined by a fixed value boundary condition. However, in some case (periodic conditions for instance) the boundary conditions are of no use to fix this constant and in order to help the convergence, the trick consists to arbitrarily set a reference value to a cell of the mesh. So usually, the value of p at a refCell is set to pRefValue (usually 0).
 
@@ -1166,10 +1674,10 @@ solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除�
 
 - 报错：
  #0 Foam::error::printStack(Foam::Ostream&)
- 
+
  You encountered a program error. Upon hitting that error OpenFOAM produced a stack trace (a list of the functions that were called) which is very useful to find the location at which the problem occured. It is possible to get that stack-trace with the source files and the line numbers of the functions which might help to find out what the problem is. To do so you have to compile a debug version of OpenFOAM. (see also the segmentation fault-question above)
 
- 
+
   **correctBoundaryConditions函数**
 
 `correctBoundaryConditions`
@@ -1193,12 +1701,16 @@ solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除�
 是因为前面存在赋值 `p_rgh = p - rho*gh;`
 
 因此，我的个人习惯是，如果是solve()出来的，不需要调用，如果是=赋值出来的，都需要correctBoundaryConditions。
- 
 
-**微分算子相关**
+- 量纲
+
+  **[kg  m  s  K  . . .]**
+
+## 微分算子相关
 
 1. 重要发现 ：
    
+
 $$(\mathbf{v\cdot\nabla})\mathbf{u=\nabla u}^T\cdot \mathbf{v=v\cdot\nabla u}$$
 
 1. 对标量场而言，左梯度与右梯度相等。
@@ -1253,22 +1765,21 @@ $$\begin{equation}
 $$\begin{equation}
 \int_\Omega u\Delta v\mathrm{d}{V}  =  \oint_{\partial\Omega} u\frac{\partial v}{\partial n}\mathrm{d}{ S }  - \int_\Omega  \nabla u\nabla v\mathrm{d}{V} 
 \end{equation}$$
-**伴随灵敏度推导**
+
+## 伴随灵敏度推导
 
 伴随变量：
-$$\pmb \theta =(\pmb{u}_a ,p_a ,T_a)$$
+$$\mathbf \theta =({u}_a ,p_a ,T_a)$$
 
 约束函数：
 $$\pmb R=(\pmb R^u,R^p,R^T)$$
 
 增广目标函数：（这是个泛函）
 
-
 $$\begin{aligned} 
 L&=\pmb\Psi +\int_\Omega \pmb \theta \cdot \pmb{R} d\Omega \\
 &=\pmb\Psi + \int_\Omega \pmb{u}_a \cdot\Big [\Big]d\Omega + \int_\Omega p_a \cdot\Big [\Big]d\Omega + \int_\Omega T_a \cdot{}\Big [\Big]d\Omega \
 \end{aligned}$$ 
-
 
 
 
