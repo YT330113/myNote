@@ -21,7 +21,7 @@ doSomething(B(20));	// 正确，使用B构造函数将int显示转换
 
 ## 02：尽量以const, enum, inline 替换＃define
 
-Prefer consts,enums, and inlines to #defines
+**Prefer consts,enums, and inlines to #defines**
 
 **静态变量static的作用是保证类里面至多只有一份该量实体**
 

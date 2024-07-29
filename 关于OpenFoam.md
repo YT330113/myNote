@@ -128,7 +128,66 @@ div(phi,U):
 
   相比 field class 多了纪录场位置 的相关信息,记录了在什么样的网格上有量 a 的相关信息或数据.
 
-## OpenFOAM 场（field）的操作和运算 
+---
+
+## Boundary Condition inOpenFOAM
+
+就是指明边界上的值和梯度是多少，有时靠给定的值就够了，有时需要结合边界处element内的值来插值
+
+不论什么边界，fixedValue还是fixedGradient，都是一个patch field列表，存储了边界面上的场值
+
+为了完成`updateCoeffs()`函数，要使用`valueInternalCoeffs`, `valueBoundaryCoeffs`, `gradientInternalCoeffs`, 和`gradientBoundaryCoeffs`来==线性化边界条件==。通过这四个函数使边界条件进入离散方程。
+
+- `valueInternalcoeffs`和`valueBoundaryCoeffs`通常用来线性化`div`算子的边界条件，因为该算子需要patch face面上的值.
+- `gradientInternalCoeffs`, 和`gradientBoundaryCoeffs`来线性化`laplacian`算子的边界条件,因为该算子需要patch face面上的梯度
+
+### Neumann boundary
+
+由于方向梯度为零，因此这种边界boundary patch上的值是等于boundary element上的值的
+
+**`div`算符：**
+
+需要的是边界面上的值（value），例如，零梯度边界条件的boundary value可以写成
+$$
+\begin{aligned}
+\phi_b&= FluxCb\,\phi_c+FluxVb \\
+&= valueInternalCoeffs\,\phi_c+valueBoundaryCoeffs \\
+&=1\phi_c+0
+\end{aligned}
+$$
+**`laplacian`算符**：
+
+需要的是边界面上的梯度（gradient），同样对于零梯度：
+$$
+\begin{aligned}
+\nabla \phi_b&=gradientInternalCoeffs\, \phi_c+GradientBoundaryCoeffs\ \\
+&=0 \phi_c+0
+\end{aligned}
+$$
+
+### Dirichlet boundary
+
+Dirichlet boundary对方程贡献只是方程右边的一个源项，因此这个边界不改变系数矩阵的对角线
+
+**`**div`算符**：
+$$
+\begin{aligned}
+\phi_b&= FluxCb\,\phi_c+FluxVb \\
+&= valueInternalCoeffs\,\phi_c+valueBoundaryCoeffs \\
+&=0\phi_c+\phi_{specified}
+\end{aligned}
+$$
+**`laplacian`算符**
+
+边界面上的gradient是基于Dirichlet的值，这种情况下要再次设施边界面处的gradient，（通过梯度线性化）
+$$
+\begin{aligned}
+\nabla \phi_b&=gradientInternalCoeffs\, \phi_c+GradientBoundaryCoeffs\ \\
+&=\frac{-\phi_c+\phi_b}{d}=(-\phi_c+\phi_b)delta=-delta\, \phi_c+delta\,\phi_b
+\end{aligned}
+$$
+
+## OpenFOAM 场（field）的操作和运算
 
 ### 几个常见的类：
 
@@ -1474,7 +1533,7 @@ List<type>
 
 Field<type>
 
-typedf Field<vector> scalarField;vectorField等等**
+typedf Field<vector> scalarField;vectorField等等
 ```
 
 ## openfoam中的类继承关系：
@@ -1524,11 +1583,11 @@ GeometricField<type,...>
 finiteVolumeMethod，隐式离散
 finiteVolumeCalculate，显示计算
 
-离散就是将微分方程转为代数方程AX=b，所以只有求解的量需要离散，其余的都可作为源项不用离散直接放到代数方程组的右边
+离散就是将微分方程转为代数方程`AX=b`，所以只有求解的量需要离散，其余的都可作为源项不用离散直接放到代数方程组的右边
 
-fvm是将该项离散为代数方程从而生成系数矩阵fvMatrix类；fvc是显示计算（如对某时间步的场量进行某种计算）仍返回一个对应的场量geometricField类
+`fvm`是将该项离散为代数方程从而生成系数矩阵fvMatrix类；`fvc`是显示计算（如对某时间步的场量进行某种计算）仍返回一个对应的场量geometricField类
 
-AX=b，fvm返回的就是系数A，fvc返回的就是源项b
+`AX=b`，`fvm`返回的就是系数A，fvc返回的就是源项b
 
 fvm::xxx(u)，其中的u是需要求出来的，fvc::xxx(u)，其中的u为当前时间步的值，其返回一个场。所以，需要你要求某个场u，就用fvm。
 
@@ -1702,9 +1761,9 @@ solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除�
 
 因此，我的个人习惯是，如果是solve()出来的，不需要调用，如果是=赋值出来的，都需要correctBoundaryConditions。
 
-- 量纲
+#### 量纲
 
-  **[kg  m  s  K  . . .]**
+**[kg  m  s  K  . . .]**
 
 ## 微分算子相关
 
@@ -1712,6 +1771,16 @@ solidDiaplacementFoam的方程中是统一除以rho之后的，因此要对E除�
    
 
 $$(\mathbf{v\cdot\nabla})\mathbf{u=\nabla u}^T\cdot \mathbf{v=v\cdot\nabla u}$$
+
+$\nabla\cdot(\nabla\bf U)^T=\nabla(\nabla\cdot\bf U)$
+
+$\nabla\cdot(\mathbf{U} \mathbf{U})=\mathbf{U} \cdot \nabla \mathbf{U}+\mathbf{U} \nabla \cdot \mathbf{U}$
+
+$
+\nabla (\alpha\bf U\cdot\bf V)=\alpha\bf U\cdot\nabla\bf V+\bf V\cdot\nabla\alpha\bf U$
+
+ $
+\mathrm{tr}\left(\nabla\mathbf{U}\right)\bf I=\mathrm{tr}\left(\nabla\mathbf{U}^{\mathrm{T}}\right)\bf I=\left(\nabla\cdot\mathbf{U}\right)\bf I$
 
 1. 对标量场而言，左梯度与右梯度相等。
 
@@ -1765,6 +1834,12 @@ $$\begin{equation}
 $$\begin{equation}
 \int_\Omega u\Delta v\mathrm{d}{V}  =  \oint_{\partial\Omega} u\frac{\partial v}{\partial n}\mathrm{d}{ S }  - \int_\Omega  \nabla u\nabla v\mathrm{d}{V} 
 \end{equation}$$
+
+**对于稳态不可压缩流动这两种写法是等价的：**
+$$\nabla \cdot (\mathbf{U}\mathbf{U})=(\mathbf U\cdot\nabla)\mathbf{U}$$
+$$\nabla \cdot(\nabla \mathbf{U})=\nabla\cdot(\nabla\mathbf{U}+\nabla\mathbf{U}^T)$$
+因为都用到了 $\nabla\cdot\mathbf U 
+=\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}+\frac{\partial w}{\partial z}=0$
 
 ## 伴随灵敏度推导
 
